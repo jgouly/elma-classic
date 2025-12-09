@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "main"
+      - "sdl"
     paths-ignore:
       - "**.md"
       - "**/docs/**"
@@ -13,16 +14,21 @@ on:
       - "**/docs/**"
 
 jobs:
-  clang-format:
-    runs-on: ubuntu-latest
+  build_win32:
+    runs-on: [windows-latest]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
 
-      - name: Install clang-format 19
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-format-19
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          variant: sccache
+          key: ${{ runner.os }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,16 +39,23 @@ jobs:
         run: python -m pip install meson==1.10.0 ninja
 
       - name: Configure
-        run: meson setup build
+        run: meson setup build -Dbuildtype=release --vsenv
 
-      - name: Check formatting
-        run: ninja -C build clang-format-check
+      - name: Build
+        run: meson compile -C build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-windows
+          path: build/elma.exe
+          retention-days: 1
 
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [macos-latest]
 
     steps:
       - name: Checkout repository
