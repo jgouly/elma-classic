@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "main"
+      - "writable-strings"
     paths-ignore:
       - "**.md"
       - "**/docs/**"
