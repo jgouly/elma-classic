@@ -197,7 +197,7 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vekt2 motorkozep, m
     vekt2 sarokbolkozepre(Viewxsize_d * (szeltoltav + baljobb * atfuthossz), Viewysize_d / 2);
     vekt2 sarok = motorkozep - sarokbolkozepre;
 
-    int vx1 = Viewxorig + baljobb * Viewxtolas;
+    int vx1 = Viewxorig + Viewxtolas;
     int vx2 = vx1 + Viewxsize - 1;
     int vy1 = 1;
     int vy2 = vy1 + Viewysize - 1;
