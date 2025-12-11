@@ -20,6 +20,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Cache Meson subprojects
+        uses: actions/cache@v4
+        with:
+          path: subprojects/packagecache
+          key: ${{ runner.os }}-meson-${{ hashFiles('subprojects/*.wrap') }}
+          restore-keys: |
+            ${{ runner.os }}-meson-
+
       - name: Install clang-format 19
         run: |
           sudo apt-get update
@@ -48,6 +56,20 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x86
+
+      - name: Cache Meson subprojects
+        uses: actions/cache@v4
+        with:
+          path: subprojects/packagecache
+          key: ${{ runner.os }}-meson-${{ hashFiles('subprojects/*.wrap') }}
+          restore-keys: |
+            ${{ runner.os }}-meson-
+
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          variant: sccache
+          key: ${{ runner.os }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
