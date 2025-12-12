@@ -50,6 +50,7 @@ elma_sources = files(
     'QOPEN.CPP',
     'RECORDER.CPP',
     'SDL.CPP',
+    'SDL_K.CPP',
     'SKIP.CPP',
     'SPRITE.CPP',
     'STATE.CPP',
@@ -75,7 +76,6 @@ if cpp.get_id() == 'msvc'
         elma_sources += files(
             'F_WIN/W_DI.CPP',
             'F_WIN/W_HHIGH.CPP',
-            'F_WIN/W_K.CPP',
             'F_WIN/W_SOUND2.CPP',
             'F_WIN/W_V.CPP',
             'H_WAV.CPP',

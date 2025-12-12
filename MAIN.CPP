@@ -80,6 +80,9 @@ int main() {
 
     initqopen();
 
+    void mk_init(void);
+    mk_init();
+
     void initmenukep1(void);
     void initmenukep2(void);
     initmenukep1();
