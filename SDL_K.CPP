@@ -3,10 +3,8 @@
 #include "scancodes_windows.h"
 #include <SDL_keyboard.h>
 
-// static int Maxkod = 500;
-// static int* Tomb = NULL;
-
-static int BufferSize = 30;
+const static int MaxKeycode = 256;
+const static int BufferSize = 30;
 static int* Buffer = NULL;
 static char* Buffer1 = NULL;
 static char* Buffer2 = NULL;
@@ -21,12 +19,12 @@ void mk_init(void) {
         hiba("mk_init() called twice!");
     }
 
-    Buffer1 = new char[256];
-    Buffer2 = new char[256];
+    Buffer1 = new char[MaxKeycode];
+    Buffer2 = new char[MaxKeycode];
     if (!Buffer1 || !Buffer2) {
         hiba("Buffer allocation failed in mk_init!()");
     }
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MaxKeycode; i++) {
         Buffer1[i] = Buffer2[i] = 0;
     }
 
@@ -42,7 +40,7 @@ void mk_init(void) {
 
 int mk_getextchar(void) {
     while (1) {
-        mv_check(/*"W_k mk_getext"*/);
+        mv_check();
         if (KeyBufferCount > 0) {
             int c = Buffer[0];
             for (int i = 0; i < KeyBufferCount - 1; i++) {
@@ -55,21 +53,17 @@ int mk_getextchar(void) {
 }
 
 void mk_emptychar(void) {
-    mv_check(/*"W_k mk_empty"*/);
+    mv_check();
     KeyBufferCount = 0;
 }
 
 int mk_kbhit(void) {
-    mv_check(/*"W_k mk_kbh"*/);
-    if (KeyBufferCount > 0) {
-        return 1;
-    } else {
-        return 0;
-    }
+    mv_check();
+    return KeyBufferCount > 0;
 }
 
 int mk_getstate(int code) {
-    if (code < 0 || code > 256) {
+    if (code < 0 || code > MaxKeycode) {
         hiba("code out of range in mk_getstate()!");
         return 0;
     }
@@ -82,7 +76,7 @@ int mk_getstate(int code) {
 
 static void sdl_kb_state(char* buffer) {
     const unsigned char* state = SDL_GetKeyboardState(NULL);
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MaxKeycode; i++) {
         buffer[i] = state[windows_scancode_table[i]];
     }
 }
@@ -110,7 +104,7 @@ void mkw_setkeydown(void) {
         prev = Buffer2;
         current = Buffer1;
     }
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MaxKeycode; i++) {
         if (!prev[i] && current[i]) {
             if (DIKToAscii[i]) {
                 if (KeyBufferCount < BufferSize) {
@@ -129,7 +123,7 @@ void mkw_setkeydown(void) {
 
 static void init_dik_to_ascii(void) {
     DIKToAscii = new int[260];
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MaxKeycode; i++) {
         DIKToAscii[i] = 0;
     }
     // Most beirjuk billentyuket:
