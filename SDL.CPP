@@ -1,5 +1,10 @@
 #include "ALL.H"
 #include <SDL.h>
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <timeapi.h>
+#endif
 
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
@@ -123,3 +128,11 @@ void mv_check(int unused) {
     }
 }
 #endif
+
+static double Startido = 0;
+
+// 182*sec-et adja vissza idot tortresszel egyutt!
+// d_stoppe.cpp-ben vannak megvalositva:
+double mv_stopperido(void) { return timeGetTime() * 0.182 - Startido; }
+
+void mv_startstopper(void) { Startido = timeGetTime() * 0.182; }
