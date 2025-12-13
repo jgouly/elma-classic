@@ -21,7 +21,7 @@ int sdl_init() {
     }
 
     SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                 640, 480, 0);
+                                 SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (!SDLWindow) {
         hiba((char*)SDL_GetError());
         return 1;
