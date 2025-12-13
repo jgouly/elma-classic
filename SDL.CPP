@@ -55,7 +55,7 @@ int sdl_init() {
     return 0;
 }
 
-static unsigned char* Mutbuffer[480];
+static unsigned char* Mutbuffer[SCREEN_HEIGHT];
 static int Bufflocked = 0;
 
 unsigned char** lockbackbuffer() {
@@ -67,13 +67,13 @@ unsigned char** lockbackbuffer() {
     unsigned char* mut = (unsigned char*)SDLSurfacePaletted->pixels;
     if (Locky0_alul) {
         // Set the row buffer bottom-down
-        for (int y = 0; y < 480; y++) {
-            Mutbuffer[480 - 1 - y] = mut;
+        for (int y = 0; y < SCREEN_HEIGHT; y++) {
+            Mutbuffer[SCREEN_HEIGHT - 1 - y] = mut;
             mut += SDLSurfacePaletted->w;
         }
     } else {
         // Set the row buffer top-down
-        for (int y = 0; y < 480; y++) {
+        for (int y = 0; y < SCREEN_HEIGHT; y++) {
             Mutbuffer[y] = mut;
             mut += SDLSurfacePaletted->w;
         }
