@@ -9,6 +9,11 @@ SDL_Surface* SDLSurfacePaletted;
 // Ha igaz, alulrol indul y (kirajz320 allitja igazba):
 int Locky0_alul = 0;
 
+static bool LeftMouseDown = false;
+static bool RightMouseDown = false;
+
+static void hide_cursor();
+
 int sdl_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         hiba((char*)SDL_GetError());
@@ -44,6 +49,8 @@ int sdl_init() {
         hiba((char*)SDL_GetError());
         return 1;
     }
+
+    hide_cursor();
 
     return 0;
 }
@@ -120,6 +127,22 @@ void mv_check(int skip_key_update) {
         case SDL_QUIT:
             exit(0);
             break;
+        case SDL_MOUSEBUTTONDOWN:
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                LeftMouseDown = true;
+            }
+            if (event.button.button == SDL_BUTTON_RIGHT) {
+                RightMouseDown = true;
+            }
+            break;
+        case SDL_MOUSEBUTTONUP:
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                LeftMouseDown = false;
+            }
+            if (event.button.button == SDL_BUTTON_RIGHT) {
+                RightMouseDown = false;
+            }
+            break;
         }
     }
 
@@ -137,4 +160,17 @@ void fill_kb_state(char* buffer) {
     for (int i = 0; i < MaxKeycode; i++) {
         buffer[i] = state[windows_scancode_table[i]];
     }
+}
+
+static void hide_cursor() { SDL_ShowCursor(SDL_DISABLE); }
+void getmou(int* x, int* y) { SDL_GetMouseState(x, y); }
+void setmou(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }
+
+int getbutbmou(void) {
+    mv_check();
+    return LeftMouseDown;
+}
+int getbutjmou(void) {
+    mv_check();
+    return RightMouseDown;
 }
