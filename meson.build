@@ -90,7 +90,7 @@ else
     cpp_args = ['-Wno-deprecated-declarations']
 
     if cpp.get_id() == 'clang'
-        cpp_args += ['-Wno-nonportable-include-path']
+        cpp_args += ['-Werror=nonportable-include-path']
     endif
 endif
 
