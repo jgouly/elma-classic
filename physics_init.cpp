@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "eol_settings.h"
 #include "physics_init.h"
 
 static motorst Motorst1;
@@ -80,7 +81,7 @@ void init_physics_data(void) {
     init_motor(Motor1);
     init_motor(Motor2);
 
-    double zoom_factor = 0.48;
+    double zoom_factor = 0.48 * EolSettings->zoom;
     MetersToPixels = 100.0 * zoom_factor;
     PixelsToMeters = 1.0 / MetersToPixels;
 

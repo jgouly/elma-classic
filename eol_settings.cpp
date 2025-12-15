@@ -18,6 +18,8 @@ eol_settings::eol_settings() {
     center_camera = false;
     center_map = false;
     map_alignment = MapAlignment::None;
+    zoom = 1.0;
+    zoom_textures = false;
 }
 
 void to_json(json& j, const MapAlignment& m) {

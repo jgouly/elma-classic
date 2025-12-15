@@ -12,6 +12,8 @@ struct eol_settings {
     bool center_camera;
     bool center_map;
     MapAlignment map_alignment;
+    double zoom;
+    bool zoom_textures;
 };
 
 extern eol_settings* EolSettings;
