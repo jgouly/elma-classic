@@ -579,6 +579,7 @@ lgrfile::lgrfile(const char* lgrnev) {
         if (strcmpi(nev, "q1body.pcx") == 0) {
             // affine_pic konstructor delete-eli ppic-t:
             mkepek1.pkisvezeto = new affine_pic(NULL, ppic);
+            mkepek1.alt_shirt = affine_pic::from_bmp("bmp/shirt.bmp");
             continue;
         }
         if (strcmpi(nev, "q1thigh.pcx") == 0) {
