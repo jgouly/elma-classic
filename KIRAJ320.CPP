@@ -638,6 +638,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
 
     // ppic->fill_box( 100 );
     Pecsetalso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+    // Pecsetfelso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
 
     // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
     int balalsox, balalsoy;
@@ -719,6 +720,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         }
     }
 
+    pic8* xxxx = new pic8(ppic->get_width(), ppic->get_height()); // pic8::copy(ppic);
     // Motoros kirajzolasa:
     kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1, shirt);
 
@@ -767,6 +769,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             draw_timers(BestTime, -1.0, t, ppic, Cxsize, Cysize);
         }
     }
+    // blit8(ppic, xxxx, 0, 0);
 }
 
 static pic8* Bpic = NULL;

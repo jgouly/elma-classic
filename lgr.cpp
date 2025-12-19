@@ -443,6 +443,7 @@ static unsigned char* create_timer_palette_map(unsigned char* pal) {
 }
 
 lgrfile::lgrfile(const char* lgrname) {
+    long long start = get_milliseconds();
     picture_count = 0;
     mask_count = 0;
     texture_count = 0;
@@ -820,6 +821,9 @@ lgrfile::lgrfile(const char* lgrname) {
 
     // Check grass
     has_grass = get_texture_index("qgrass") >= 0 && grass_pics->length >= 2;
+
+    long long end = get_milliseconds();
+    printf("lgrload: %lld\n", end - start);
 }
 
 static void delete_bike_pics(bike_pics* bp) {
