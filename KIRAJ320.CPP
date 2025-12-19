@@ -619,12 +619,13 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
 
     // ppic->fill_box( 100 );
     Pecsetalso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+    // Pecsetfelso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
 
     // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
     int balalsox, balalsoy;
     Pecsetalso->getbalalso_int(sarok, &balalsox, &balalsoy);
-    int objminx = balalsox - ANIM_WIDTH - 2;
-    int objminy = balalsoy - ANIM_WIDTH - 2;
+    int objminx = (balalsox - ANIM_WIDTH - 2) / 2;
+    int objminy = (balalsoy - ANIM_WIDTH - 2) / 2;
     int objmaxx = balalsox + SCREEN_WIDTH;
     int objmaxy = balalsoy + SCREEN_HEIGHT;
     for (int i = 0; i < MAX_OBJECTS; i++) {
@@ -701,6 +702,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     }
 
     // Motoros kirajzolasa:
+    pic8* xxxx = new pic8(ppic->get_width(), ppic->get_height()); // pic8::copy(ppic);
     kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1);
 
     if (!EolSettings->pictures_in_background) {
@@ -748,6 +750,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             draw_timers(BestTime, -1.0, t, ppic, Cxsize, Cysize);
         }
     }
+    // blit8(ppic, xxxx, 0, 0);
 }
 
 static pic8* Bpic = NULL;

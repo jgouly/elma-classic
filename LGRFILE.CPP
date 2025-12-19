@@ -529,6 +529,7 @@ lgrfile::lgrfile(const char* lgrnev) {
     pic8* p1biker = NULL;
     pic8* p2biker = NULL;
     pic8* pcolors = NULL;
+    long long start = get_milliseconds();
     for (int i = 0; i < osszkepszam; i++) {
         // Egy kep:
         char nev[30];
@@ -752,6 +753,8 @@ lgrfile::lgrfile(const char* lgrnev) {
         // Ismeretlen tipus:
         external_error("Corrupt LGR file!:", lgrtmp);
     }
+    long long end = get_milliseconds();
+    printf("piclist: %ld\n", end - start);
 
     int checknumber = 0;
     if (fread(&checknumber, 1, 4, h) != 4) {
