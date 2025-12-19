@@ -1,12 +1,14 @@
 #include "menu_options.h"
 #include "eol_settings.h"
 #include "JATEKOS.H"
+#include "LGRFILE.H"
 #include "LOAD.H"
 #include "menu_controls.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
 #include "TOPOL.H"
 #include <cstring>
+#include "physics_init.h"
 
 void menu_help() {
     menu_pic menu;
@@ -136,17 +138,23 @@ void menu_options() {
         sprintf(NavEntriesRight[13 + flag_tag_opt], "%dx%d", EolSettings->screen_width,
                 EolSettings->screen_height);
 
-        strcpy(NavEntriesLeft[14 + flag_tag_opt], "Renderer:");
+        strcpy(NavEntriesLeft[14 + flag_tag_opt], "Zoom:");
+        sprintf(NavEntriesRight[14 + flag_tag_opt], "%.2f", EolSettings->zoom);
+
+        strcpy(NavEntriesLeft[15 + flag_tag_opt], "Zoom Textures:");
+        strcpy(NavEntriesRight[15 + flag_tag_opt], EolSettings->zoom_textures ? "Yes" : "No");
+
+        strcpy(NavEntriesLeft[16 + flag_tag_opt], "Renderer:");
         switch (EolSettings->renderer) {
         case RendererType::Software:
-            strcpy(NavEntriesRight[14 + flag_tag_opt], "Software");
+            strcpy(NavEntriesRight[16 + flag_tag_opt], "Software");
             break;
         case RendererType::OpenGL:
-            strcpy(NavEntriesRight[14 + flag_tag_opt], "OpenGL");
+            strcpy(NavEntriesRight[16 + flag_tag_opt], "OpenGL");
             break;
         }
 
-        nav.setup(15 + flag_tag_opt, true);
+        nav.setup(16 + flag_tag_opt, true);
 
         choice = nav.navigate();
 
@@ -246,6 +254,23 @@ void menu_options() {
         }
 
         if (choice == 14) {
+            EolSettings->zoom += 0.25;
+            if (EolSettings->zoom > 2.5) {
+                EolSettings->zoom = 1;
+            }
+
+            set_zoom_factor();
+            invalidate_lgr_cache();
+            invalidate_ptop();
+        }
+
+        if (choice == 15) {
+            EolSettings->zoom_textures = !EolSettings->zoom_textures;
+            invalidate_lgr_cache();
+            invalidate_ptop();
+        }
+
+        if (choice == 16) {
             switch (EolSettings->renderer) {
             case RendererType::Software: {
                 EolSettings->renderer = RendererType::OpenGL;
@@ -256,7 +281,7 @@ void menu_options() {
                 break;
             }
             }
-        }
+	}
 
         if (flag_tag_opt) {
             choice += 1;
