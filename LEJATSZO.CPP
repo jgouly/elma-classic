@@ -1,6 +1,7 @@
 #include "LEJATSZO.H"
 #include "directinput_scancodes.h"
 #include "EDITUJ.H"
+#include "eol_settings.h"
 #include "flagtag.h"
 #include "HANGHIGH.H"
 #include "KIRAJZOL.H"
@@ -116,14 +117,15 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
                       long* pmegvanido, int* pmeghalt, double eddig, double dt) {
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
+    int alo = EolSettings->alovolt_P1;
     if (eddig > pvalt->utolsougras + VoltDelay) {
-        if (is_key_down(popciok->right_volt)) {
+        if (is_key_down(alo) || is_key_down(popciok->right_volt)) {
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
             startwavegyujto(WavEvent::RightVolt, 0.99, -1);
         }
-        if (is_key_down(popciok->left_volt)) {
+        if (is_key_down(alo) || is_key_down(popciok->left_volt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;

@@ -18,6 +18,8 @@ struct eol_settings {
     double zoom;
     bool zoom_textures;
     RendererType renderer;
+
+    int alovolt_P1;
 };
 
 extern eol_settings* EolSettings;

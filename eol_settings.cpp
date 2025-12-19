@@ -1,3 +1,4 @@
+#include "directinput_scancodes.h"
 #include "eol_settings.h"
 #include "main.h"
 #include <fstream>
@@ -23,6 +24,7 @@ eol_settings::eol_settings() {
     zoom = 1.0;
     zoom_textures = false;
     renderer = RendererType::Software;
+    alovolt_P1 = DIK_S;
 }
 
 void to_json(json& j, const MapAlignment& m) {
