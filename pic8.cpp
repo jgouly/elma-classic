@@ -6,6 +6,7 @@
 #include "qopen.h"
 #include <algorithm>
 #include <cstring>
+#include <cstdlib>
 
 void pic8::allocate(int w, int h) {
     if (rows || pixels) {
@@ -90,7 +91,36 @@ pic8* pic8::scale(pic8* src, double scale) {
     const int scaled_height = std::max((int)(src->get_height() * scale), 1);
 
     pic8* scaled = new pic8(scaled_width, scaled_height);
-    blit_scale8(scaled, src);
+    if (getenv("OLD") != 0) {
+        blit_scale8(scaled, src);
+    } else {
+        int xsize = scaled->width;
+        int ysize = scaled->height;
+
+        int prev_i1 = -1;
+        for (int i2 = 0; i2 < ysize; i2++) {
+            int i1 = (int)(i2 / scale);
+            if (i1 >= src->height) {
+                i1 = src->height - 1;
+            }
+            if (prev_i1 == i1) {
+                // Copy references to identical rows in order to scale faster
+                scaled->rows[i2] = scaled->rows[i2 - 1];
+                continue;
+            }
+            prev_i1 = i1;
+            for (int j2 = 0; j2 < xsize; j2++) {
+                int j1 = (int)(j2 / scale);
+                if (j1 >= src->width) {
+                    j1 = src->width - 1;
+                }
+                // We don't use ppixel to be more efficient, but we need to check
+                // that we don't accidentally overflow through bad rounding
+                scaled->rows[i2][j2] = src->rows[i1][j1];
+            }
+        }
+    }
+
     delete src;
     return scaled;
 }
