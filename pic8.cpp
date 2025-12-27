@@ -668,14 +668,14 @@ bool get_pcx_pal(const char* filename, unsigned char* pal) {
     return true;
 }
 
-bool get_pcx_pal(const char* filename, ddpal** sdl_pal) {
+bool get_pcx_pal(const char* filename, palette** pal2) {
     unsigned char pal[768];
     get_pcx_pal(filename, pal);
     // Hardcoded modification to the menu palette:
     if (strcmp(filename, "intro.pcx") == 0) {
         pal[0] = pal[1] = pal[2] = 0;
     }
-    *sdl_pal = new ddpal(pal);
+    *pal2 = new palette(pal);
     return true;
 }
 
