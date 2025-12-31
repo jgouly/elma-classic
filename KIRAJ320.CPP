@@ -99,16 +99,32 @@ void beallitmereteket(int splitscreen) {
     Viewxtolas = Cxsize - 2 * Viewxorig - Viewxsize;
 }
 
+/*
++EXPORT void Pic8VerticalFlipDLL(pic8_t* ppic) {
++    const int ysize = ppic->ysize;
++    for (int i = 0; i < ysize / 2; i++) {
++        std::swap(ppic->sormuttomb[i], ppic->sormuttomb[ysize - i - 1]);
++    }
++}
+*/
+
 void forditkepet(pic8* ppic) {
-    for (int y1 = 0; y1 < ppic->get_height() / 2; y1++) {
-        int y2 = ppic->get_height() - 1 - y1;
-        unsigned char* sora = ppic->get_row(y1);
-        unsigned char* sorb = ppic->get_row(y2);
-        int xsize = ppic->get_width();
-        for (int x = 0; x < xsize; x++) {
-            unsigned char tmp = sora[x];
-            sora[x] = sorb[x];
-            sorb[x] = tmp;
+    if (getenv("OLD_FLIP")) {
+        for (int y1 = 0; y1 < ppic->get_height() / 2; y1++) {
+            int y2 = ppic->get_height() - 1 - y1;
+            unsigned char* sora = ppic->get_row(y1);
+            unsigned char* sorb = ppic->get_row(y2);
+            int xsize = ppic->get_width();
+            for (int x = 0; x < xsize; x++) {
+                unsigned char tmp = sora[x];
+                sora[x] = sorb[x];
+                sorb[x] = tmp;
+            }
+        }
+    } else {
+        const int height = ppic->get_height();
+        for (int i = 0; i < height / 2; ++i) {
+            std::swap(ppic->rows[i], ppic->rows[height - i - 1]);
         }
     }
 }
