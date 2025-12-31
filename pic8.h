@@ -14,6 +14,7 @@ class pic8 {
     friend pic8* lockbackbuffer_pic(bool flipped);
     friend void lockfrontbuffer_pic(bool flipped);
     friend void unlockbackbuffer_pic();
+    friend void forditkepet(pic8* ppic);
 
     void allocate(int w, int h);
     void spr_open(const char* filename, FILE* h);
