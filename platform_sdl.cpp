@@ -1,5 +1,6 @@
 #include "ALL.H"
-#include <SDL.h>
+#include <SDL3/SDL.h>
+#include <cmath>
 #include "scancodes_windows.h"
 
 SDL_Window* SDLWindow;
@@ -18,29 +19,30 @@ void message_box(const char* text) {
 }
 
 void platform_init() {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) == 0) {
         hiba(SDL_GetError());
         return;
     }
 
-    SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    SDLWindow = SDL_CreateWindow("Elasto Mania",// SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                  SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (!SDLWindow) {
         hiba(SDL_GetError());
         return;
     }
 
-    SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
-    SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
+    //SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
+    //SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
 
     SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
     if (!SDLSurfaceMain) {
         hiba(SDL_GetError());
         return;
     }
-    SDLSurfacePaletted = SDL_CreateRGBSurfaceWithFormat(0, SDLSurfaceMain->w, SDLSurfaceMain->h, 0,
+    SDLSurfacePaletted = SDL_CreateSurface(SDLSurfaceMain->w, SDLSurfaceMain->h,
                                                         SDL_PIXELFORMAT_INDEX8);
-    if (!SDLSurfacePaletted) {
+    SDL_Palette *palette = SDL_CreateSurfacePalette(SDLSurfacePaletted);
+    if (!SDLSurfacePaletted||!palette) {
         hiba(SDL_GetError());
         return;
     }
@@ -113,14 +115,14 @@ palette::palette(unsigned char* palette_data) {
 palette::~palette() { delete[] (SDL_Color*)data; }
 
 void palette::set() {
-    SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, (const SDL_Color*)data, 0, 256);
+    SDL_SetPaletteColors(SDL_GetSurfacePalette(SDLSurfacePaletted), (const SDL_Color*)data, 0, 256);
 }
 
 void handle_events() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-        case SDL_QUIT:
+        case SDL_EVENT_QUIT:
             // Exit request probably sent by user to terminate program
             if (Editorban_dialnak && Valtozott) {
                 // Disallow exiting if unsaved changes in editor
@@ -128,17 +130,17 @@ void handle_events() {
             }
             exit(0);
             break;
-        case SDL_WINDOWEVENT:
+        //case SDL_WINDOWEVENT:
             // Force editor redraw if focus gained/lost to fix editor sometimes blanking
-            switch (event.window.event) {
-            case SDL_WINDOWEVENT_FOCUS_GAINED:
+          //  switch (event.window.event) {
+            case SDL_EVENT_WINDOW_FOCUS_GAINED:
                 invalidateegesz();
                 break;
-            case SDL_WINDOWEVENT_FOCUS_LOST:
+            case SDL_EVENT_WINDOW_FOCUS_LOST:
                 invalidateegesz();
                 break;
-            }
-        case SDL_MOUSEBUTTONDOWN:
+            //}
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {
                 LeftMouseDown = true;
             }
@@ -146,7 +148,7 @@ void handle_events() {
                 RightMouseDown = true;
             }
             break;
-        case SDL_MOUSEBUTTONUP:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
             if (event.button.button == SDL_BUTTON_LEFT) {
                 LeftMouseDown = false;
             }
@@ -162,16 +164,16 @@ void handle_events() {
 }
 
 void fill_key_state(char* buffer) {
-    const unsigned char* state = SDL_GetKeyboardState(NULL);
+    const bool* state = SDL_GetKeyboardState(NULL);
     for (int i = 0; i < MaxKeycode; i++) {
         buffer[i] = state[windows_scancode_table[i]];
     }
 }
 
-void hide_cursor() { SDL_ShowCursor(SDL_DISABLE); }
-void show_cursor() { SDL_ShowCursor(SDL_ENABLE); }
+void hide_cursor() { SDL_HideCursor(); }
+void show_cursor() { SDL_ShowCursor(); }
 
-void get_mouse_position(int* x, int* y) { SDL_GetMouseState(x, y); }
+void get_mouse_position(int* x, int* y) { float fx,fy; SDL_GetMouseState(&fx, &fy); *x = std::round(fx);*y = std::round(fy);}
 void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }
 
 bool left_mouse_clicked() {
@@ -201,6 +203,7 @@ void init_sound() {
     }
     SoundInitialized = true;
 
+    /*
     SDL_AudioSpec desired_spec;
     memset(&desired_spec, 0, sizeof(desired_spec));
     desired_spec.callback = audio_callback;
@@ -222,4 +225,5 @@ void init_sound() {
     }
     Hangenabled = 1;
     SDL_PauseAudioDevice(SDLAudioDevice, 0);
+    */
 }

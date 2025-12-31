@@ -95,7 +95,7 @@ static void directhiba(const char* text1, const char* text2, const char* text3, 
     mv_exit();
 }
 
-void hiba(const char* text1, const char* text2, const char* text3) {
+void hiba_(const char* text1, const char* text2, const char* text3) {
     if (access("message.inf", 0) == 0) {
         directhiba("<<message.inf accessed>>", text1, text2, text3);
     }

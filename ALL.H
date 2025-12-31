@@ -9,9 +9,12 @@
 #else
 #include <unistd.h>
 #endif
+#include <cassert>
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+
+#define hiba(...) assert(0)
 
 // Ez Win95-os verzio h file-ja, csak ennek egy szinten kell
 // lennie tobbi forras file-lal.

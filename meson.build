@@ -92,11 +92,11 @@ else
     cpp_args += ['-Wno-deprecated-declarations']
 endif
 
-sdl2_dep = dependency('sdl2',
+sdl3_dep = dependency('sdl3',
     static: build_machine.system() == 'windows',
     default_options: {
-        'test': false,
-        'with_main': false,
+      #'test': false,
+      #  'with_main': false,
     }
 )
 
@@ -105,6 +105,6 @@ elma = executable(
     elma_sources,
     cpp_args: cpp_args,
     link_args: link_args,
-    dependencies: [sdl2_dep],
+    dependencies: [sdl3_dep],
     win_subsystem: win_subsystem,
 )
