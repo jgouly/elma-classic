@@ -39,6 +39,9 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
     }
 
     int window_flags = EolSettings->renderer() == RendererType::OpenGL ? SDL_WINDOW_OPENGL : 0;
+    if (getenv("FULLSCREEN")) {
+        window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
 
     SDLWindow =
         SDL_CreateWindow("Elasto Mania", window_pos_x, window_pos_y, width, height, window_flags);
@@ -71,6 +74,10 @@ static void create_palette_surface() {
     if (!SDLSurfacePaletted) {
         internal_error(SDL_GetError());
         return;
+    }
+
+    if (is_fullscreen()) {
+        hide_cursor();
     }
 }
 
@@ -170,17 +177,19 @@ unsigned char** lock_backbuffer(bool flipped) {
     SurfaceLocked = true;
 
     unsigned char* row = (unsigned char*)SDLSurfacePaletted->pixels;
+    row += ((SDLSurfacePaletted->h - SCREEN_HEIGHT) / 2) * SDLSurfacePaletted->pitch;
     if (flipped) {
         // Set the row buffer bottom-down
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            SurfaceBuffer[SCREEN_HEIGHT - 1 - y] = row;
-            row += SDLSurfacePaletted->w;
+            SurfaceBuffer[SCREEN_HEIGHT - 1 - y] =
+                row + ((SDLSurfacePaletted->w - SCREEN_WIDTH) / 2);
+            row += SDLSurfacePaletted->pitch;
         }
     } else {
         // Set the row buffer top-down
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            SurfaceBuffer[y] = row;
-            row += SDLSurfacePaletted->w;
+            SurfaceBuffer[y] = row + ((SDLSurfacePaletted->w - SCREEN_WIDTH) / 2);
+            row += SDLSurfacePaletted->pitch;
         }
     }
 

@@ -396,7 +396,9 @@ void mainmenu(void) {
             InEditor = true;
             hide_cursor();
             editor();
-            show_cursor();
+            if (!is_fullscreen()) {
+                show_cursor();
+            }
             InEditor = false;
             MenuPalette->set();
         }
