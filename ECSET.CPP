@@ -916,7 +916,7 @@ static int getanyagszam(unsigned char* sor, int x, int xsize, unsigned char atla
     return sum;
 }
 
-#define KOVVONALHOSSZ (10000)
+#define KOVVONALHOSSZ (500000)
 static int Kovetoytomb[KOVVONALHOSSZ + 10];
 
 constexpr int Keltolas = 20;
