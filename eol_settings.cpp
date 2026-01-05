@@ -21,10 +21,14 @@ eol_settings::eol_settings() {
     center_camera = false;
     center_map = false;
     map_alignment = MapAlignment::None;
-    zoom = 1.0;
+    zoom_ = 1.0;
     zoom_textures = false;
     renderer = RendererType::Software;
     alovolt_P1 = DIK_S;
+}
+
+void eol_settings::set_zoom(double z) {
+    zoom_ = (z < MIN_ZOOM) ? MIN_ZOOM : (z > MAX_ZOOM ? MAX_ZOOM : z);
 }
 
 void to_json(json& j, const MapAlignment& m) {

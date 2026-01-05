@@ -459,7 +459,7 @@ void ecset::mutatotlanit(void) {
 
 // Ptop kerek-jeinek egesz koordinatait kitolti:
 void ecset::kitoltfoodkoordokat(void) {
-    const double offset = (double)(ANIM_WIDTH / 2) * EolSettings->zoom;
+    const double offset = (double)(ANIM_WIDTH / 2) * EolSettings->zoom();
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* pker = Ptop->objects[i];
         if (!pker) {
@@ -992,7 +992,7 @@ void ecset::kovetotextura(grass* pkov, int index, int xo, int yo, int fazis) {
         }
     }
     // Most beadjuk alul vagy felul megtoldott reszt is:
-    int grass_height_padding = QGRASS_EXTRA_HEIGHT * EolSettings->zoom;
+    int grass_height_padding = QGRASS_EXTRA_HEIGHT * EolSettings->zoom();
     if (felso) {
         // Felso:
         for (int y = 0; y < grass_height_padding; y++) {

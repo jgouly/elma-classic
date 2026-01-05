@@ -139,7 +139,7 @@ void menu_options() {
                 EolSettings->screen_height);
 
         strcpy(NavEntriesLeft[14 + flag_tag_opt], "Zoom:");
-        sprintf(NavEntriesRight[14 + flag_tag_opt], "%.2f", EolSettings->zoom);
+        sprintf(NavEntriesRight[14 + flag_tag_opt], "%.2f", EolSettings->zoom());
 
         strcpy(NavEntriesLeft[15 + flag_tag_opt], "Zoom Textures:");
         strcpy(NavEntriesRight[15 + flag_tag_opt], EolSettings->zoom_textures ? "Yes" : "No");
@@ -254,9 +254,10 @@ void menu_options() {
         }
 
         if (choice == 14) {
-            EolSettings->zoom += 0.25;
-            if (EolSettings->zoom > 2.5) {
-                EolSettings->zoom = 1;
+            double old_zoom = EolSettings->zoom();
+            EolSettings->set_zoom(old_zoom + 0.25);
+            if (old_zoom == EolSettings->zoom()) {
+                EolSettings->set_zoom(0.25);
             }
 
             set_zoom_factor();

@@ -665,13 +665,13 @@ lgrfile::lgrfile(const char* lgrnev) {
 
         // Objektumok:
         if (strcmpi(nev, "qkiller.pcx") == 0) {
-            pkiller = new anim(ppic, "qkiller.pcx", EolSettings->zoom);
+            pkiller = new anim(ppic, "qkiller.pcx", EolSettings->zoom());
             delete ppic;
             ppic = NULL;
             continue;
         }
         if (strcmpi(nev, "qexit.pcx") == 0) {
-            pexit = new anim(ppic, "qexit.pcx", EolSettings->zoom);
+            pexit = new anim(ppic, "qexit.pcx", EolSettings->zoom());
             delete ppic;
             ppic = NULL;
             continue;
@@ -691,7 +691,7 @@ lgrfile::lgrfile(const char* lgrnev) {
             char tmpnev[20];
             sprintf(tmpnev, "qfood%d.pcx", foodi + 1);
             if (strcmpi(nev, tmpnev) == 0) {
-                foodtomb[foodi] = new anim(ppic, tmpnev, EolSettings->zoom);
+                foodtomb[foodi] = new anim(ppic, tmpnev, EolSettings->zoom());
                 delete ppic;
                 ppic = NULL;
                 ezfoodvolt = 1;
@@ -733,7 +733,7 @@ lgrfile::lgrfile(const char* lgrnev) {
             external_error("There is no line in PICTURES.LST corresponding to picture:", nev);
         }
         if (ppiclist->type[index] == piclist::Type::Picture) {
-            ppic = pic8::scale(ppic, EolSettings->zoom);
+            ppic = pic8::scale(ppic, EolSettings->zoom());
             beirkepet(ppic, ppiclist, index);
             delete ppic; // Kepre mar nincsen tobbe szuksegunk
             ppic = NULL;
@@ -741,13 +741,13 @@ lgrfile::lgrfile(const char* lgrnev) {
         }
         if (ppiclist->type[index] == piclist::Type::Texture) {
             if (EolSettings->zoom_textures) {
-                ppic = pic8::scale(ppic, EolSettings->zoom);
+                ppic = pic8::scale(ppic, EolSettings->zoom());
             }
             beirtexturat(ppic, ppiclist, index);
             continue;
         }
         if (ppiclist->type[index] == piclist::Type::Mask) {
-            ppic = pic8::scale(ppic, EolSettings->zoom);
+            ppic = pic8::scale(ppic, EolSettings->zoom());
             // delete-li ppic-et:
             beirmaszkot(ppic, ppiclist, index);
             ppic = NULL;
