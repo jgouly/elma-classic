@@ -90,11 +90,15 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(center_camera)                                                                      \
     JSON_FIELD(center_map)                                                                         \
     JSON_FIELD(map_alignment)                                                                      \
+    JSON_FIELD_SET(zoom)                                                                           \
+    JSON_FIELD(zoom_textures)                                                                      \
     JSON_FIELD(renderer)
 
 #define JSON_FIELD(name) {#name, s.name},
+#define JSON_FIELD_SET(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
 #undef JSON_FIELD
+#undef JSON_FIELD_SET
 
 #define JSON_FIELD(name)                                                                           \
     try {                                                                                          \
@@ -104,8 +108,16 @@ void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
     } catch (const char* e) {                                                                      \
         external_error("Invalid parameter in " SETTINGS_JSON "!", e);                              \
     }
+
+#define JSON_FIELD_SET(name)                                                                       \
+    {                                                                                              \
+        decltype(s.name()) name;                                                                   \
+        name = j.value(#name, s.name());                                                           \
+        s.set_##name(name);                                                                        \
+    }
 void from_json(const json& j, eol_settings& s) { FIELD_LIST }
 #undef JSON_FIELD
+#undef JSON_FIELD_SET
 
 void eol_settings::read_settings() {
     if (access(SETTINGS_JSON, 0) != 0) {

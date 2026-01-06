@@ -282,7 +282,7 @@ void menu_options() {
                 break;
             }
             }
-	}
+        }
 
         if (flag_tag_opt) {
             choice += 1;

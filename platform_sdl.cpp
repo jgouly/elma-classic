@@ -46,7 +46,7 @@ void platform_init() {
 
     int window_flags = CurrentRenderer == RendererType::OpenGL ? SDL_WINDOW_OPENGL : 0;
     if (getenv("FULLSCREEN")) {
-window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
 
     SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
