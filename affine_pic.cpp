@@ -10,6 +10,11 @@ affine_pic::affine_pic(const char* filename, pic8* pic) {
         pic = new pic8(filename);
     }
 
+    memset(name, 0, 200);
+    if (filename) {
+        strcpy(name, filename);
+    }
+
     // Transparency is hard-coded to the topleft
     transparency = pic->gpixel(0, 0);
 

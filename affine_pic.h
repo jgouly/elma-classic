@@ -11,6 +11,7 @@ class affine_pic {
     int height;
     affine_pic(const char* filename, pic8* pic);
     ~affine_pic();
+    char name[200];
 };
 
 #endif
