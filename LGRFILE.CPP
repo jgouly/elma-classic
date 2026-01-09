@@ -119,7 +119,7 @@ static void chopdarab(pic8* pbiker, affine_pic** ppkiskep, kisbox* pbox) {
 
     pic8* ppic = new pic8(pbox->x2 - pbox->x1 + 1, pbox->y2 - pbox->y1 + 1);
     blit8(ppic, pbiker, -pbox->x1, -pbox->y1);
-    *ppkiskep = new affine_pic(NULL, ppic); // ppic-et ez deleteli is
+    *ppkiskep = new affine_pic("bike part", ppic); // ppic-et ez deleteli is
 }
 
 void lgrfile::chopbiker(pic8* pbiker, motkepek* pkepek) {
@@ -571,85 +571,85 @@ lgrfile::lgrfile(const char* lgrnev) {
         // 1. motoros reszei:
         if (strcmpi(nev, "q1body.pcx") == 0) {
             // affine_pic konstructor delete-eli ppic-t:
-            mkepek1.pkisvezeto = new affine_pic(NULL, ppic);
+            mkepek1.pkisvezeto = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q1thigh.pcx") == 0) {
-            mkepek1.pkiscomb = new affine_pic(NULL, ppic);
+            mkepek1.pkiscomb = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q1leg.pcx") == 0) {
-            mkepek1.pkislabszar = new affine_pic(NULL, ppic);
+            mkepek1.pkislabszar = new affine_pic(nev, ppic);
             continue;
         }
 
         if (strcmpi(nev, "q1wheel.pcx") == 0) {
-            mkepek1.pkiskerek = new affine_pic(NULL, ppic);
+            mkepek1.pkiskerek = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q1susp1.pcx") == 0) {
-            mkepek1.pkiselsorud = new affine_pic(NULL, ppic);
+            mkepek1.pkiselsorud = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q1susp2.pcx") == 0) {
-            mkepek1.pkishatsorud = new affine_pic(NULL, ppic);
+            mkepek1.pkishatsorud = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q1forarm.pcx") == 0) {
-            mkepek1.pkisalkar = new affine_pic(NULL, ppic);
+            mkepek1.pkisalkar = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q1up_arm.pcx") == 0) {
-            mkepek1.pkisfelkar = new affine_pic(NULL, ppic);
+            mkepek1.pkisfelkar = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q1head.pcx") == 0) {
-            mkepek1.pkisfej = new affine_pic(NULL, ppic);
+            mkepek1.pkisfej = new affine_pic(nev, ppic);
             continue;
         }
 
         // 2. motoros reszei:
         if (strcmpi(nev, "q2body.pcx") == 0) {
             // affine_pic konstructor delete-eli ppic-t:
-            mkepek2.pkisvezeto = new affine_pic(NULL, ppic);
+            mkepek2.pkisvezeto = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q2thigh.pcx") == 0) {
-            mkepek2.pkiscomb = new affine_pic(NULL, ppic);
+            mkepek2.pkiscomb = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q2leg.pcx") == 0) {
-            mkepek2.pkislabszar = new affine_pic(NULL, ppic);
+            mkepek2.pkislabszar = new affine_pic(nev, ppic);
             continue;
         }
 
         if (strcmpi(nev, "q2wheel.pcx") == 0) {
-            mkepek2.pkiskerek = new affine_pic(NULL, ppic);
+            mkepek2.pkiskerek = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q2susp1.pcx") == 0) {
-            mkepek2.pkiselsorud = new affine_pic(NULL, ppic);
+            mkepek2.pkiselsorud = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q2susp2.pcx") == 0) {
-            mkepek2.pkishatsorud = new affine_pic(NULL, ppic);
+            mkepek2.pkishatsorud = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q2forarm.pcx") == 0) {
-            mkepek2.pkisalkar = new affine_pic(NULL, ppic);
+            mkepek2.pkisalkar = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q2up_arm.pcx") == 0) {
-            mkepek2.pkisfelkar = new affine_pic(NULL, ppic);
+            mkepek2.pkisfelkar = new affine_pic(nev, ppic);
             continue;
         }
         if (strcmpi(nev, "q2head.pcx") == 0) {
-            mkepek2.pkisfej = new affine_pic(NULL, ppic);
+            mkepek2.pkisfej = new affine_pic(nev, ppic);
             continue;
         }
 
         if (strcmpi(nev, "qflag.pcx") == 0) {
-            pkiszaszlo = new affine_pic(NULL, ppic);
+            pkiszaszlo = new affine_pic(nev, ppic);
             continue;
         }
 
