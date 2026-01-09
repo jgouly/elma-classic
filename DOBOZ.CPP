@@ -272,9 +272,9 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
     double szint = ybal;
 
     // Kiszamolja hatarolo egyenesek parametereit:
-    long hatbal1, hatjobb1;
+    int hatbal1, hatjobb1;
     double m1d = u.x / u.y;
-    long hatbal2, hatjobb2;
+    int hatbal2, hatjobb2;
     double m2d = v.x / v.y;
     if (Affinitas) {
         // u es v nem biztos, hogy merolegesek egymasra, ezert szamitas
@@ -323,19 +323,19 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
         }
     }
 
-    long m1 = m1d * 65536.0;
-    long m2 = m2d * 65536.0;
+    int m1 = m1d * 65536.0;
+    int m2 = m2d * 65536.0;
 
     // Most kiszamoljuk kis kepen futok elejet:
     vect2 diff = vect2(xbal, ybal) - r;
     vect2 kiskeporigo = vect2(0.5, 0.5) + diff.x * invi + diff.y * invj;
-    long xkiskep = kiskeporigo.x * 65536.0;
-    long ykiskep = kiskeporigo.y * 65536.0;
+    int xkiskep = kiskeporigo.x * 65536.0;
+    int ykiskep = kiskeporigo.y * 65536.0;
 
-    long invix = invi.x * 65536.0;
-    long inviy = invi.y * 65536.0;
-    long invjx = invj.x * 65536.0;
-    long invjy = invj.y * 65536.0;
+    int invix = invi.x * 65536.0;
+    int inviy = invi.y * 65536.0;
+    int invjx = invj.x * 65536.0;
+    int invjy = invj.y * 65536.0;
 
     short* pf_hatbal1 = (short*)(&hatbal1);
     pf_hatbal1++;
