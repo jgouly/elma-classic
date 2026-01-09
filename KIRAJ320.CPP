@@ -1,5 +1,7 @@
 #include "KIRAJZOL.H"
+#include "abc8.h"
 #include "anim.h"
+#include "best_times.h"
 #include "DOBOZ.H"
 #include "ECSET.H"
 #include "EDITUJ.H"
@@ -767,9 +769,20 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             draw_timers(BestTime, -1.0, t, ppic, Cxsize, Cysize);
         }
     }
+
+    static abc8* Pmenuabc = nullptr;
+    if (!Pmenuabc) {
+        Pmenuabc = new abc8("small.abc");
+        Pmenuabc->set_spacing(1);
+    }
+    extern int last_apple_time;
+    char tmp[50];
+    sprintf(tmp, "(%d): ", Motor1->apple_count);
+    centiseconds_to_string(last_apple_time, tmp+5, true);
+    Pmenuabc->write(ppic, 20, 22, tmp);
     // blit8(ppic, xxxx, 0, 0);
 }
-
+int last_apple_time;
 static pic8* Bpic = NULL;
 
 extern int Ucsosurlodas;
