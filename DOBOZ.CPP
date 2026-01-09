@@ -3,6 +3,7 @@
 #include "affine_pic.h"
 #include "KIRAJZOL.H"
 #include "pic8.h"
+#include <cassert>
 
 // Affinitassal kapcsolatos dolgok:
 int Affinitas = 0;
@@ -14,8 +15,12 @@ static double Affinaranyy = 1.0;
 
 static double Tulvizszintes = 0.005;
 
-void egysor(unsigned char lyuk, unsigned char szam, unsigned char* sor, unsigned char* tomb,
-            long futox, long futoy, long dx, long dy) {
+size_t max_ok_joe = 0;
+size_t joe_height = 0;
+char joe_name[200];
+
+__attribute__((noinline)) void egysor(unsigned char lyuk, unsigned char szam, unsigned char* sor,
+                                      unsigned char* tomb, int futox, int futoy, int dx, int dy) {
     short* pf_futox = (short*)(&futox);
     pf_futox++;
     short* pf_futoy = (short*)(&futoy);
@@ -25,6 +30,10 @@ void egysor(unsigned char lyuk, unsigned char szam, unsigned char* sor, unsigned
         unsigned short fy = *pf_futoy;
         fy = (unsigned short)((fy << 8) + fx);
 
+        if (fy >= max_ok_joe) {
+            printf("%d %ld %ld %s\n", fy, max_ok_joe, joe_height, joe_name);
+        }
+        assert(fy < max_ok_joe);
         unsigned char c = tomb[fy];
         if (c != lyuk) {
             sor[x] = c;
@@ -36,8 +45,9 @@ void egysor(unsigned char lyuk, unsigned char szam, unsigned char* sor, unsigned
 }
 
 // Ez a fuggveny kilogas eseten hivodik meg, plussz parametere xhossz:
-void egysor(unsigned char lyuk, short szam, unsigned char* sor, unsigned char* tomb, long futox,
-            long futoy, long dx, long dy, int xhossz) {
+__attribute__((noinline)) void egysor(unsigned char lyuk, short szam, unsigned char* sor,
+                                      unsigned char* tomb, int futox, int futoy, int dx, int dy,
+                                      int xhossz) {
     short* pf_futox = (short*)(&futox);
     pf_futox++;
     short* pf_futoy = (short*)(&futoy);
@@ -417,6 +427,10 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
                 }
                 unsigned char* cim = ppic8->get_row(ybal);
                 cim += xbal;
+                // printf("max %d\n", pkiskep->height * 256);
+                max_ok_joe = pkiskep->height * 256;
+                joe_height = pkiskep->height;
+                strcpy(joe_name, pkiskep->name);
                 egysor(lyuk, short(x2 - x1 + 1), cim, pkiskep->pixels, xkiskep, ykiskep, invix,
                        inviy);
             } else {
