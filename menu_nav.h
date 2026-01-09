@@ -40,7 +40,7 @@ class menu_nav {
     ~menu_nav();
     void setup(int len, bool two_col = false);
     int navigate(text_line* extra_lines = nullptr, int extra_lines_length = 0,
-                 bool render_only = false);
+                 bool render_only = false, bool (*key_handler)(int key) = nullptr);
 
     void render();
 

@@ -96,13 +96,14 @@ menu_nav::~menu_nav() {
 // Load the menu with data from NavEntriesLeft and, if two columns, NavEntriesRight
 void menu_nav::setup(int len, bool two_col) {
     if (entries_left) {
-        internal_error("menu_nav::setup called twice!");
+        delete[] entries_left;
     }
     length = len;
     two_columns = two_col;
+    /*
     if (length < 1 || length > NavEntriesLeftMaxLength) {
         internal_error("menu_nav::setup length too long!");
-    }
+    }*/
     if (two_columns && length > NAV_ENTRIES_RIGHT_MAX_LENGTH) {
         internal_error("menu_nav::setup length too long (two_columns)!");
     }
@@ -151,7 +152,8 @@ int menu_nav::calculate_visible_entries(int extra_lines_length) {
 }
 
 // Render menu and return selected index (or -1 if Esc)
-int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool render_only) {
+int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool render_only,
+                       bool (*key_handler)(int key)) {
     if (length < 1) {
         internal_error("menu_nav::navigate invalid setup!");
     }
@@ -183,6 +185,12 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     while (true) {
         while (!render_only && has_keypress()) {
             Keycode c = get_keypress();
+            if (key_handler && key_handler(c)) {
+                selected_index = 0;
+                view_index = 0;
+                rerender = true;
+                break;
+            }
             if (c == KEY_ESC && enable_esc) {
                 CtrlAltPressed = false;
                 return -1;

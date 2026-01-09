@@ -9,6 +9,9 @@
 #include "PLAY.H"
 #include "TOPOL.H"
 #include <cstring>
+#include <algorithm>
+#include <string>
+#include <vector>
 
 /*static egyszovsor Idoszovegek[4];
 
@@ -111,16 +114,49 @@ static void abcberendez(int szam) {
     }
 }
 
+std::vector<std::string> lev_names;
+std::string fuzzy_input;
+menu_nav val;
+bool key_handler(int code) {
+    if (code == KEY_BACKSPACE) {
+        if (!fuzzy_input.empty()) {
+            fuzzy_input.pop_back();
+        }
+    } else if (code >= '0' && code <= 'z') {
+        fuzzy_input.push_back(code);
+    } else {
+        return false;
+    }
+
+    int i = 0;
+    for (std::string& name : lev_names) {
+        if (strnicmp(name.c_str(), fuzzy_input.c_str(), fuzzy_input.size()) == 0 ||
+            fuzzy_input.empty()) {
+            if (i >= NavEntriesLeftMaxLength) {
+                break;
+            }
+            strcpy(NavEntriesLeft[i++], name.c_str());
+        }
+    }
+
+    strcpy(val.title, "Select External File!: ");
+    strcat(val.title, fuzzy_input.c_str());
+    val.setup(i);
+    return true;
+}
+
 // Nincs h-ja, hanem prototype ki van irva play.cpp-ben:
 void playextmenu(void) {
     // Kiirjuk osszes lev file nevet ide:
     finame fname;
     bool done = find_first("lev/*.lev", fname);
     int szam = 0;
+    lev_names.clear();
+    fuzzy_input = "";
     while (!done) {
         char* filenev = fname;
 
-        strcpy(NavEntriesLeft[szam], filenev);
+        lev_names.push_back(filenev);
 
         done = find_next(fname);
         szam++;
@@ -135,7 +171,11 @@ void playextmenu(void) {
         return;
     }
 
-    abcberendez(szam);
+    int i = 0;
+    std::sort(lev_names.begin(), lev_names.end());
+    for (std::string& name : lev_names) {
+        strcpy(NavEntriesLeft[i++], name.c_str());
+    }
 
     int kezdo = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
     for (int i = 0; i < szam; i++) {
@@ -148,14 +188,13 @@ void playextmenu(void) {
     }
 
     // Feltoltottuk neveket, jon valasztas:
-    menu_nav val;
     val.selected_index = kezdo;
     strcpy(val.title, "Select External File!");
 
     val.setup(szam);
 
     while (1) {
-        int eredmeny = val.navigate();
+        int eredmeny = val.navigate(nullptr, 0, false, key_handler);
         if (eredmeny < 0) {
             return;
         }
