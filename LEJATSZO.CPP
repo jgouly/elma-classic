@@ -16,6 +16,7 @@
 #include "TOPOL.H"
 #include <cmath>
 #include <cstring>
+#include "directinput_scancodes.h"
 
 // Jatek modja ket fele lehet:
 int Single = 1;
@@ -118,6 +119,22 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
     int alo = EolSettings->alovolt_P1;
+    if (is_key_down(DIK_RBRACKET) || is_key_down(DIK_LBRACKET)) {
+        if (is_key_down(DIK_RBRACKET)) {
+            EolSettings->set_zoom(EolSettings->zoom() - 0.25);
+        } else {
+            EolSettings->set_zoom(EolSettings->zoom() + 0.25);
+        }
+
+        set_zoom_factor();
+        invalidate_lgr_cache();
+        loadlgrfile(Ptop->lgr_name);
+        // invalidate_ptop();
+        // Ptop = nullptr;
+        void betoltecseteket();
+        betoltecseteket();
+        Kitoltestmegrak = Kitoltestmegrakkezd;
+    }
     if (eddig > pvalt->utolsougras + VoltDelay) {
         if (is_key_down(alo) || is_key_down(popciok->right_volt)) {
             ugrik1 = 1;

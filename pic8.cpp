@@ -4,6 +4,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "qopen.h"
+#include <cstdlib>
 #include <cstring>
 
 void pic8::allocate(int w, int h) {
