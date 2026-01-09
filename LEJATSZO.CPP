@@ -115,6 +115,22 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
                       long* pmegvanido, int* pmeghalt, double eddig, double dt) {
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
+    if (is_key_down(DIK_RBRACKET) || is_key_down(DIK_LBRACKET)) {
+        if (is_key_down(DIK_RBRACKET)) {
+            EolSettings->set_zoom(EolSettings->zoom() - 0.25);
+        } else {
+            EolSettings->set_zoom(EolSettings->zoom() + 0.25);
+        }
+
+        set_zoom_factor();
+        invalidate_lgr_cache();
+        lgrfile::load_lgr_file(Ptop->lgr_name);
+        // invalidate_ptop();
+        // Ptop = nullptr;
+        void betoltecseteket();
+        betoltecseteket();
+        Kitoltestmegrak = Kitoltestmegrakkezd;
+    }
     if (eddig > pvalt->utolsougras + VoltDelay) {
         if (is_key_down(popciok->right_volt) || is_key_down(popciok->alovolt)) {
             ugrik1 = 1;
