@@ -211,13 +211,21 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     int objszam;
     while (get_event_buffer(&wavazonosito, &hangero, &objszam)) {
         if (objszam >= 0) {
+            int prev = pmot->apple_count;
             int eredmeny = spritefeldolgoz(objszam, &pmot->apple_count, pmot);
+            int after = pmot->apple_count;
             if (eredmeny == 0 || eredmeny == 1) {
                 if (eredmeny == 0) {
                     *pmeghalt = 1;
                 } else {
                     *pmegvanido = eddig * TimeToCentiseconds;
                 }
+            }
+
+            if (prev < after) {
+                // printf("%d %d t %ld\n", prev, after, *pmegvanido);
+                extern int last_apple_time;
+                last_apple_time = eddig * 100.0 / (182.0 * 0.0024);
             }
         } else {
             start_wav(wavazonosito, hangero);
