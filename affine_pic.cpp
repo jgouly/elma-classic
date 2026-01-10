@@ -26,7 +26,7 @@ affine_pic::affine_pic(const char* filename, pic8* pic) {
         internal_error("affine_pic size > 255!");
     }
 
-    int length = height * 256;
+    int length = (height + 5) * 256;
     pixels = new unsigned char[length];
     if (!pixels) {
         external_error("affine_pic out of memory!");

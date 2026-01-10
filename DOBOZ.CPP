@@ -20,18 +20,25 @@ size_t joe_height = 0;
 char joe_name[200];
 
 __attribute__((noinline)) void egysor(unsigned char lyuk, unsigned char szam, unsigned char* sor,
-                                      unsigned char* tomb, int futox, int futoy, int dx, int dy) {
-    short* pf_futox = (short*)(&futox);
-    pf_futox++;
-    short* pf_futoy = (short*)(&futoy);
-    pf_futoy++;
+                                      unsigned char* tomb, int futox, int futoy, int dx, int dy,
+                                      int x2, int x1) {
+    // short* pf_futox = (short*)(&futox);
+    // pf_futox++;
+    // short* pf_futoy = (short*)(&futoy);
+    // pf_futoy++;
+    // printf("szam %d\n", szam);
     for (short x = 0; x < szam; x++) {
-        unsigned short fx = *pf_futox;
-        unsigned short fy = *pf_futoy;
+        unsigned short fx = futox >> 16; //*pf_futox;
+        unsigned short fy = futoy >> 16; //*pf_futoy;
+        unsigned short fy_ = fy;
         fy = (unsigned short)((fy << 8) + fx);
 
+        if (joe_height == 88 && fy_ >= 88) {
+            printf("(%d %d), %d szam %d\n", fx, fy_, joe_height, szam);
+        }
         if (fy >= max_ok_joe) {
-            printf("%d %ld %ld %s\n", fy, max_ok_joe, joe_height, joe_name);
+            printf("%d %ld %ld %s (%d, %d) (x2, x1) = (%d, %d), szam = %d, (futox, futox) = (%d, %d)\n", fy, max_ok_joe,
+                   joe_height, joe_name, fx, fy_, x2, x1, szam, futox, futoy);
         }
         assert(fy < max_ok_joe);
         unsigned char c = tomb[fy];
@@ -432,7 +439,7 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
                 joe_height = pkiskep->height;
                 strcpy(joe_name, pkiskep->name);
                 egysor(lyuk, short(x2 - x1 + 1), cim, pkiskep->pixels, xkiskep, ykiskep, invix,
-                       inviy);
+                       inviy, x2, x1);
             } else {
                 if (x1 > x2 + 1) {
                     return;
