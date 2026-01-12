@@ -20,7 +20,6 @@
 #include "sprite.h"
 #include <algorithm>
 #include <cstring>
-#include <new>
 
 constexpr int MAGIC_NUMBER = 187565543;
 
@@ -123,7 +122,7 @@ static pic8* generate_default_texture(texture* text) {
     int original_width = text->original_width;
     int tiles = (SCREEN_WIDTH + original_width - 1) / original_width + 1;
 
-    pic8* tiled = new (std::align_val_t{4294967296}) pic8(original_width * tiles, text->pic->get_height());
+    pic8* tiled = new pic8(original_width * tiles, text->pic->get_height());
     for (int i = 0; i < tiles; i++) {
         blit8(tiled, text->pic, i * original_width, 0);
     }
@@ -282,7 +281,7 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
         }
     }
 
-    new_pic->data = new (std::align_val_t{4294967296}) unsigned char[buffer_offset + 10];
+    new_pic->data = new unsigned char[buffer_offset + 10];
     if (!new_pic->data) {
         internal_error("Not enough memory!");
     }
