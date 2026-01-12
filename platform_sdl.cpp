@@ -84,6 +84,35 @@ void platform_init() {
     if (is_fullscreen()) {
         hide_cursor();
     }
+
+    void fps_counter_init();
+    fps_counter_init();
+}
+
+static Uint32 fps_frame_count = 0;
+static Uint64 fps_last_time = 0;
+static double fps_current = 0.0;
+
+void fps_counter_init() {
+    fps_frame_count = 0;
+    fps_last_time = SDL_GetTicks64();
+    fps_current = 0.0;
+}
+
+void fps_counter_frame() {
+    fps_frame_count++;
+    Uint64 current_time = SDL_GetTicks64();
+    Uint64 elapsed = current_time - fps_last_time;
+
+    if (elapsed >= 500) {
+        fps_current = (fps_frame_count * 1000.0) / elapsed;
+        fps_frame_count = 0;
+        fps_last_time = current_time;
+
+        char title[128];
+        snprintf(title, sizeof(title), "Elasto Mania - FPS: %.1f", fps_current);
+        SDL_SetWindowTitle(SDLWindow, title);
+    }
 }
 
 long long get_milliseconds() { return SDL_GetTicks64(); }
@@ -130,6 +159,8 @@ void unlock_backbuffer() {
         SDL_BlitSurface(SDLSurfacePaletted, NULL, SDLSurfaceMain, NULL);
         SDL_UpdateWindowSurface(SDLWindow);
     }
+
+    fps_counter_frame();
 }
 
 unsigned char** lock_frontbuffer(bool flipped) {
