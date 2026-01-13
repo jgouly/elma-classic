@@ -744,7 +744,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         }
     }
 
-    pic8* xxxx = new pic8(ppic->get_width(), ppic->get_height()); // pic8::copy(ppic);
+    // pic8* xxxx = new pic8(ppic->get_width(), ppic->get_height()); // pic8::copy(ppic);
     // Motoros kirajzolasa:
     if (!spying_map) {
         kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1, shirt);

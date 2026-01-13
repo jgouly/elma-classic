@@ -10,9 +10,9 @@ class object;
 class polygon;
 class sprite;
 
-constexpr int MAX_POLYGONS = 300;
-constexpr int MAX_VERTICES = 5000;
-constexpr int MAX_OBJECTS = 52;
+constexpr int MAX_POLYGONS = 1000;
+constexpr int MAX_VERTICES = 20000;
+constexpr int MAX_OBJECTS = 252;
 constexpr int MAX_SPRITES = 5000;
 
 constexpr int LEVEL_NAME_LENGTH = 50;
