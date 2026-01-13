@@ -41,7 +41,7 @@ struct mdarabtomb {
     mdarabtomb* kovtomb;
 };
 
-#define MAXECSETSOR (12000)
+#define MAXECSETSOR (24000)
 
 struct darab {
     int xsize;

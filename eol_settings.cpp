@@ -1,6 +1,9 @@
 #include "directinput_scancodes.h"
 #include "eol_settings.h"
+#include "LGRFILE.H"
+#include "LOAD.H"
 #include "main.h"
+#include "physics_init.h"
 #include <fstream>
 #define JSON_DIAGNOSTICS 1
 #include <nlohmann/json.hpp>
@@ -28,7 +31,13 @@ eol_settings::eol_settings() {
 }
 
 void eol_settings::set_zoom(double z) {
+	if (z != zoom_) {
     zoom_ = (z < MIN_ZOOM) ? MIN_ZOOM : (z > MAX_ZOOM ? MAX_ZOOM : z);
+
+            set_zoom_factor();
+            invalidate_lgr_cache();
+            invalidate_ptop();
+	}
 }
 
 void to_json(json& j, const MapAlignment& m) {

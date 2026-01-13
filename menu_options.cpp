@@ -8,7 +8,7 @@
 #include "menu_pic.h"
 #include "TOPOL.H"
 #include <cstring>
-#include "physics_init.h"
+//#include "physics_init.h"
 
 void menu_help() {
     menu_pic menu;
@@ -259,10 +259,6 @@ void menu_options() {
             if (old_zoom == EolSettings->zoom()) {
                 EolSettings->set_zoom(0.25);
             }
-
-            set_zoom_factor();
-            invalidate_lgr_cache();
-            invalidate_ptop();
         }
 
         if (choice == 15) {

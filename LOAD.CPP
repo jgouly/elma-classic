@@ -7,6 +7,7 @@
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "platform_utils.h"
+#include "platform_impl.h"
 #include "segments.h"
 #include "TOPOL.H"
 #include <cstring>
@@ -62,7 +63,10 @@ int floadlevel_p(const char* nev) {
         if (Segments) {
             delete Segments;
         }
+        uint64_t s = get_milliseconds();
         Segments = new segments(Ptop);
+        uint64_t e = get_milliseconds();
+        printf("seg load: %lld (%lld - %lld)\n", e - s, e, s);
         if (HeadRadius > Motor1->left_wheel.radius) {
             Segments->setup_collision_grid(HeadRadius);
         } else {

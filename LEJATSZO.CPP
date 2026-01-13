@@ -226,7 +226,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
             }
 
             if (prev < after) {
-	    //printf("%d %d t %ld\n", prev, after, *pmegvanido);
+                // printf("%d %d t %ld\n", prev, after, *pmegvanido);
                 extern int last_apple_time;
                 last_apple_time = eddig * 100.0 / (182.0 * 0.0024);
             }

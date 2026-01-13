@@ -778,7 +778,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     extern int last_apple_time;
     char tmp[50];
     sprintf(tmp, "(%d): ", Motor1->apple_count);
-    centiseconds_to_string(last_apple_time, tmp+5, true);
+    centiseconds_to_string(last_apple_time, tmp + 5, true);
     Pmenuabc->write(ppic, 20, 22, tmp);
     // blit8(ppic, xxxx, 0, 0);
 }
