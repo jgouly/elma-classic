@@ -649,8 +649,14 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, valtozok* pvalt,
                              int viewki, int timeki, motorst* pmot2, valtozok* pvalt2) {
 
+    // bool spying_map = true;
+    extern bool spying_map;
     // Kiszamoljuk kepernyo bal also sarkat:
     vect2 motorkozep = pmot->bike.r;
+    extern vect2 camera_xy;
+    if (spying_map) {
+        motorkozep = camera_xy;
+    }
 
     vect2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
 
@@ -740,7 +746,9 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
 
     pic8* xxxx = new pic8(ppic->get_width(), ppic->get_height()); // pic8::copy(ppic);
     // Motoros kirajzolasa:
-    kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1, shirt);
+    if (!spying_map) {
+        kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1, shirt);
+    }
 
     if (!EolSettings->pictures_in_background()) {
         // Felso ecset kitevese:

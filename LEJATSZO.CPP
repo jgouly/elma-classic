@@ -343,6 +343,10 @@ int Aerintetteviragot = 0;
 
 int Masodikmenet = 0;
 
+vect2 camera_xy;
+
+bool spying_map = false;
+
 // Idot adja vissza szazadmasodpercben:
 long lejatszo(const char* filenev) {
     // internal_error( "Ezegyhosszusor,szetkellvagnibiztosanhibaEzegy hosszu sor, szet kell vagni
@@ -367,6 +371,8 @@ long lejatszo(const char* filenev) {
     } else {
         MultiplayerRec = 1;
     }
+
+    spying_map = is_key_down(DIK_F1);
 
     int palmegnincs = 1;
     init_physics_data();
@@ -408,6 +414,7 @@ long lejatszo(const char* filenev) {
     long megvanido2 = 0;
     resetleptet(Motor1);
     resetleptet(Motor2);
+    camera_xy = Motor1->bike.r;
 
     initsoundlejatszoban();
     Mute = false;
@@ -457,11 +464,11 @@ long lejatszo(const char* filenev) {
                 dt = cel - eddig;
             }
 
-            if (!meghalt1) {
+            if (!meghalt1 && !spying_map) {
                 belsoresz(Motor1, &State->keys1, &valt1, Rec1, &megvanido1, &meghalt1, eddig, dt);
             }
 
-            if (!Single && !meghalt2) {
+            if (!Single && !meghalt2 && !spying_map) {
                 belsoresz(Motor2, &State->keys2, &valt2, Rec2, &megvanido2, &meghalt2, eddig, dt);
             }
 
@@ -549,11 +556,30 @@ long lejatszo(const char* filenev) {
             set_motor_frequency(false, valt2.inf.motor_frequency, valt2.inf.gas);
         }
 
-        kulsoresz(Motor1, &State->keys1, &valt1, Rec1, &Viewtime1, eddig, &valt2.showkep, meghalt1);
+        if (!spying_map) {
+            kulsoresz(Motor1, &State->keys1, &valt1, Rec1, &Viewtime1, eddig, &valt2.showkep,
+                      meghalt1);
+        }
 
         if (!Single) {
             kulsoresz(Motor2, &State->keys2, &valt2, Rec2, &Viewtime2, eddig, &valt1.showkep,
                       meghalt2);
+        }
+
+        if (is_key_down(DIK_LEFT)) {
+            camera_xy.x -= 0.001;
+        }
+
+        if (is_key_down(DIK_RIGHT)) {
+            camera_xy.x += 0.001;
+        }
+
+        if (is_key_down(DIK_UP)) {
+            camera_xy.y += 0.001;
+        }
+
+        if (is_key_down(DIK_DOWN)) {
+            camera_xy.y -= 0.001;
         }
 
         if (palmegnincs) {
