@@ -175,6 +175,8 @@ void platform_recreate_window() {
 
     gl_cleanup();
 
+    SDL_HideWindow(SDLWindow);
+
     if (SDLSurfacePaletted) {
         SDL_FreeSurface(SDLSurfacePaletted);
         SDLSurfacePaletted = nullptr;
@@ -188,6 +190,8 @@ void platform_recreate_window() {
     SDL_DestroyWindow(SDLWindow);
     SDLWindow = nullptr;
 
+    // delete SurfaceBuffer;
+    // SurfaceBuffer = new unsigned char*[SCREEN_HEIGHT];
     create_window(x, y, width, height);
     initialize_renderer();
     create_palette_surface();

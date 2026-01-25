@@ -47,9 +47,8 @@ void csokkentkepmeret(void) {
 }
 
 // Kirajzolando terulet nagysaga:
-static int Cx1 = 0, Cy1 = 0, Cx2 = SCREEN_WIDTH - 1, Cy2 = SCREEN_HEIGHT - 1, Cy1Bplayer = 0,
-           Cy2Bplayer = 0;
-int Cxsize = SCREEN_WIDTH, Cysize = SCREEN_HEIGHT;
+static int Cx1 = 0, Cy1 = 0, Cx2 = 0, Cy2 = 0 - 1, Cy1Bplayer = 0, Cy2Bplayer = 0;
+int Cxsize = 0, Cysize = 0;
 
 // Motoros kepernyo mely reszen helyezkedik el:
 static double Mo_y = 0.0, Mo_bal = 0.0, Mo_dx = 0.0;
@@ -653,12 +652,13 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     extern bool spying_map;
     // Kiszamoljuk kepernyo bal also sarkat:
     vect2 motorkozep = pmot->bike.r;
-    extern vect2 camera_xy;
-    if (spying_map) {
-        motorkozep = camera_xy;
-    }
 
     vect2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
+
+    extern vect2 camera_xy;
+    if (spying_map) {
+        sarok = camera_xy;
+    }
 
     // ppic->fill_box( 100 );
     Pecsetalso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
