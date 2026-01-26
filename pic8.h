@@ -20,6 +20,7 @@ class pic8 {
     bool spr_save(const char* filename, FILE* h);
     void pcx_open(const char* filename, FILE* h = nullptr);
     bool pcx_save(const char* filename, unsigned char* pal);
+    void bmp_open(const char* filename, FILE* h = nullptr);
 
     int width;
     int height;

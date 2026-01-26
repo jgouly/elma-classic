@@ -73,6 +73,10 @@ pic8::pic8(const char* filename, FILE* h) {
                 pcx_open(filename, h);
                 return;
             }
+            if (strcmpi(filename + i, ".bmp") == 0) {
+                bmp_open(filename, h);
+                return;
+            }
             internal_error("pic8 unknown file extension: ", filename);
             return;
         }
@@ -516,6 +520,46 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     }
     fclose(h);
     return true;
+}
+
+#define BMP_HEADER_SIZE 1078
+#define BMP_WIDTH_EOLMAX 256
+#define BMP_WIDTH 149
+#define BMP_WIDTH_PADDED 152
+#define BMP_EOL_ARRAY_SIZE (BMP_WIDTH_EOLMAX * BMP_HEIGHT)
+#define BMP_HEIGHT 101
+#define BMP_PIXEL_ARRAY_SIZE (BMP_WIDTH_PADDED * BMP_HEIGHT)
+
+void pic8::bmp_open(const char* filename, FILE* h) {
+    bool h_not_provided = false;
+    if (!h) {
+        h_not_provided = true;
+        h = fopen(filename, "rb");
+        if (!h) {
+            internal_error("Failed to open PCX file!: ", filename);
+        }
+    }
+    unsigned char data[BMP_PIXEL_ARRAY_SIZE] = {0};
+    FILE* f = fopen(filename, "rb");
+    if (!f) {
+        internal_error("couldn't open shirt");
+        return;
+    }
+
+    fseek(f, BMP_HEADER_SIZE, SEEK_SET);
+    fread(data, BMP_PIXEL_ARRAY_SIZE, 1, f);
+    printf("hi\n");
+
+    allocate(149, 101);
+
+    for (int h = 0; h < BMP_HEIGHT; h++) {
+        int src_row = BMP_HEIGHT - 1 - h; // BMP is bottom-up
+        memcpy(rows[h], &data[src_row * BMP_WIDTH_PADDED], BMP_WIDTH);
+    }
+
+    if (h_not_provided) {
+        fclose(h);
+    }
 }
 
 // Paste source (x1, y1, x2, y2) into dest at (x, y)
