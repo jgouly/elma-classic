@@ -10,6 +10,8 @@ class affine_pic {
     int width;
     int height;
     affine_pic(const char* filename, pic8* pic);
+    affine_pic(int w, int h);
+    static affine_pic* from_bmp(const char* filename);
     ~affine_pic();
 };
 
