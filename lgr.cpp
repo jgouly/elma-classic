@@ -455,6 +455,49 @@ static unsigned char* makenegalttomb(unsigned char* pal) {
     return lookuptomb;
 }
 
+#define BMP_HEADER_SIZE 1078
+#define BMP_WIDTH_EOLMAX 256
+#define BMP_WIDTH 149
+#define BMP_WIDTH_PADDED 152
+#define BMP_EOL_ARRAY_SIZE (BMP_WIDTH_EOLMAX * BMP_HEIGHT)
+#define BMP_HEIGHT 101
+#define BMP_PIXEL_ARRAY_SIZE (BMP_WIDTH_PADDED * BMP_HEIGHT)
+
+static affine_pic* load_shirt_from_bmp(const char* filename) {
+    unsigned char data[BMP_PIXEL_ARRAY_SIZE] = {0};
+    FILE* f = fopen(filename, "rb");
+    if (!f) {
+        return nullptr;
+    }
+
+    fseek(f, BMP_HEADER_SIZE, SEEK_SET);
+    fread(data, BMP_PIXEL_ARRAY_SIZE, 1, f);
+    affine_pic* k = new affine_pic(149, 101);
+
+    /*
+        k->lyuk = 0;
+        for (int y = 0; y < k->ysize; y++) {
+            for (int x = 0; x < k->xsize; x++) {
+                k->tomb[y * 256 + x] = x % 256;
+            }
+        }*/
+    k->transparency = data[0];
+    /*
+    for (int i = 0; i < BMP_EOL_ARRAY_SIZE; i++) {
+ //       if ((i % BMP_WIDTH_EOLMAX < BMP_WIDTH) && (i / BMP_WIDTH_EOLMAX < BMP_HEIGHT)) {
+   //         k->pixels[i] = data[BMP_WIDTH_PADDED * ((BMP_HEIGHT - 1) - i / BMP_WIDTH_EOLMAX) +
+     //                           (i % BMP_WIDTH_EOLMAX)];
+        }
+    }*/
+
+    for (int h = 0; h < BMP_HEIGHT; h++) {
+        int src_row = BMP_HEIGHT - 1 - h; // BMP is bottom-up
+        memcpy(&k->pixels[h * 256], &data[src_row * BMP_WIDTH_PADDED], BMP_WIDTH);
+    }
+
+    return k;
+}
+
 lgrfile::lgrfile(const char* lgrnev) {
     // Lenullaz mindent:
     kepszam = 0;
@@ -584,12 +627,14 @@ lgrfile::lgrfile(const char* lgrnev) {
         if (strcmpi(nev, "q1body.pcx") == 0) {
             // affine_pic konstructor delete-eli ppic-t:
             mkepek1.pkisvezeto = new affine_pic(NULL, ppic);
-            FILE* alt_shirt = fopen("bmp/shirt.bmp", "rb");
-            if (alt_shirt) {
-                mkepek1.alt_shirt = new affine_pic(
-                    NULL,
-                    new pic8("bmp/shirt.bmp", alt_shirt));
-            }
+            // FILE* alt_shirt = fopen("bmp/shirt.bmp", "rb");
+            mkepek1.alt_shirt = load_shirt_from_bmp("bmp/shirt.bmp");
+            /*
+                if (alt_shirt) {
+                    mkepek1.alt_shirt = new affine_pic(
+                        NULL,
+                        new pic8("bmp/shirt.bmp", alt_shirt));
+                }*/
             continue;
         }
         if (strcmpi(nev, "q1thigh.pcx") == 0) {
