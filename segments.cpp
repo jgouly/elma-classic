@@ -97,6 +97,7 @@ segment_node* segments::new_node() {
         }
         cur_array->next = nullptr;
         node_array_index = 0;
+        printf("allocating extra\n");
     }
     // Return the new unused node
     return &cur_array->nodes[node_array_index++];

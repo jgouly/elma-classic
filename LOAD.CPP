@@ -24,6 +24,7 @@ void invalidate_level() { Volttopsave = 1; }
 // Ha belso file-ban is megvan palya onnan veszi:
 // Hamissal ter vissza, ha hibas topologiaju level:
 int floadlevel_p(const char* nev) {
+    uint64_t sw = get_milliseconds();
     if (!nev) {
         internal_error("floadlevel_p-ben !nev!");
     }
@@ -37,6 +38,7 @@ int floadlevel_p(const char* nev) {
         if (Ptop) {
             delete Ptop;
         }
+        uint64_t sptop = get_milliseconds();
         Ptop = new level(nev);
         if (Ptop->topology_errors) {
             // Kiir hiba uzenetet:
@@ -60,22 +62,26 @@ int floadlevel_p(const char* nev) {
         }
         lgrfile::load_lgr_file(Ptop->lgr_name);
         Ptop->discard_missing_lgr_assets(Lgr);
+        uint64_t eptop = get_milliseconds();
+        printf("ptop load: %lld (%lld - %lld)\n", eptop - sptop, eptop, sptop);
 
         if (Segments) {
             delete Segments;
         }
         uint64_t s = get_milliseconds();
         Segments = new segments(Ptop);
-        uint64_t e = get_milliseconds();
-        printf("seg load: %lld (%lld - %lld)\n", e - s, e, s);
         if (HeadRadius > Motor1->left_wheel.radius) {
             Segments->setup_collision_grid(HeadRadius);
         } else {
             Segments->setup_collision_grid(Motor1->left_wheel.radius);
         }
+        uint64_t e = get_milliseconds();
+        printf("seg load: %lld (%lld - %lld)\n", e - s, e, s);
 
         betoltecseteket();
     }
+    uint64_t ew = get_milliseconds();
+    printf("load: %lld (%lld - %lld)\n", ew - sw, ew, sw);
     return 1;
 }
 
