@@ -112,17 +112,18 @@ static double baljobbszamol(double eltelt, int hatra) {
 
 // Ide csak *pmeghalt == 0-val erkezhet
 static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, recorder* prec,
-                      long* pmegvanido, int* pmeghalt, double eddig, double dt) {
+                      long* pmegvanido, int* pmeghalt, double eddig, double dt, int alo,
+                      int brake_alias) {
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
     if (eddig > pvalt->utolsougras + VoltDelay) {
-        if (is_key_down(popciok->right_volt)) {
+        if (is_key_down(popciok->right_volt) || is_key_down(popciok->alovolt)) {
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
             add_event_buffer(WavEvent::RightVolt, 0.99, -1);
         }
-        if (is_key_down(popciok->left_volt)) {
+        if (is_key_down(popciok->left_volt) || is_key_down(popciok->alovolt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;
@@ -132,7 +133,8 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // LEPTET!!!!!!!:
     // 0-meghalt, 1-megnyerte, 2-semmi kulonos
-    leptet(pmot, eddig, dt, is_key_down(popciok->gas), is_key_down(popciok->brake), ugrik1, ugrik2);
+    leptet(pmot, eddig, dt, is_key_down(popciok->gas),
+           is_key_down(popciok->brake) || is_key_down(brake_alias), ugrik1, ugrik2);
 
     int eredmeny = vizsgalat(pmot);
     if (eredmeny == 0) {
@@ -433,11 +435,15 @@ long lejatszo(const char* filenev) {
             }
 
             if (!meghalt1) {
-                belsoresz(Motor1, &State->keys1, &valt1, Rec1, &megvanido1, &meghalt1, eddig, dt);
+                belsoresz(Motor1, &State->keys1, &valt1, Rec1, &megvanido1, &meghalt1, eddig, dt,
+                          EolSettings->alovolt_key_player_a(),
+                          EolSettings->brake_alias_key_player_a());
             }
 
             if (!Single && !meghalt2) {
-                belsoresz(Motor2, &State->keys2, &valt2, Rec2, &megvanido2, &meghalt2, eddig, dt);
+                belsoresz(Motor2, &State->keys2, &valt2, Rec2, &megvanido2, &meghalt2, eddig, dt,
+                          EolSettings->alovolt_key_player_b(),
+                          EolSettings->brake_alias_key_player_b());
             }
 
             if (!(meghalt1 && meghalt2)) {
@@ -556,7 +562,7 @@ long lejatszo(const char* filenev) {
         snapnyomva = is_key_down(State->key_screenshot);
 
         // Vizsgalat kilepesre:
-        if (is_key_down(DIK_ESCAPE)) {
+        if (is_key_down(DIK_ESCAPE) || is_key_down(EolSettings->escape_alias_key())) {
             MeghalteloszorAB = 0;
             double eltelido = stopwatch();
             // Motor hangjat kikapcsolja:

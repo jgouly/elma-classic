@@ -1,6 +1,7 @@
 #include "TELJES.H"
 #include "abc8.h"
 #include "ball_collision.h"
+#include "eol_settings.h"
 #include "EDITUJ.H"
 #include "JATEKOS.H"
 #include "keys.h"
@@ -71,6 +72,8 @@ void teljes(void) {
     if (!State) {
         external_error("memory");
     }
+
+    State->keys1.alovolt = EolSettings->alovolt_key_player_a();
 
     mergestatedat();
 

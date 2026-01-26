@@ -38,24 +38,3 @@ bool has_keypress() {
     return KeyBufferCount > 0;
 }
 
-DikScancode get_key_alias(DikScancode key) {
-    if (key == State->keys1.left_volt || key == State->keys1.right_volt) {
-        return EolSettings->alovolt_key_player_a();
-    }
-    if (key == State->keys2.left_volt || key == State->keys2.right_volt) {
-        return EolSettings->alovolt_key_player_b();
-    }
-
-    if (key == State->keys1.brake) {
-        return EolSettings->brake_alias_key_player_a();
-    }
-    if (key == State->keys2.brake) {
-        return EolSettings->brake_alias_key_player_b();
-    }
-
-    if (key == DIK_ESCAPE) {
-        return EolSettings->escape_alias_key();
-    }
-
-    return 0;
-}
