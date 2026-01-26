@@ -63,6 +63,7 @@ struct motkepek {
     affine_pic* pkisalkar;
     affine_pic* pkisfelkar;
     affine_pic* pkisfej;
+    affine_pic* alt_shirt;
 };
 
 #define MAXKOVETOK (20)
