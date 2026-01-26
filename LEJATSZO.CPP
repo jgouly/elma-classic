@@ -112,18 +112,18 @@ static double baljobbszamol(double eltelt, int hatra) {
 
 // Ide csak *pmeghalt == 0-val erkezhet
 static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, recorder* prec,
-                      long* pmegvanido, int* pmeghalt, double eddig, double dt, int alo,
+                      long* pmegvanido, int* pmeghalt, double eddig, double dt, int alovolt,
                       int brake_alias) {
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
     if (eddig > pvalt->utolsougras + VoltDelay) {
-        if (is_key_down(popciok->right_volt) || is_key_down(popciok->alovolt)) {
+        if (is_key_down(popciok->right_volt) || is_key_down(alovolt)) {
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
             add_event_buffer(WavEvent::RightVolt, 0.99, -1);
         }
-        if (is_key_down(popciok->left_volt) || is_key_down(popciok->alovolt)) {
+        if (is_key_down(popciok->left_volt) || is_key_down(alovolt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;

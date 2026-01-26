@@ -37,4 +37,3 @@ bool has_keypress() {
     handle_events();
     return KeyBufferCount > 0;
 }
-

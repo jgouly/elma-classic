@@ -31,7 +31,7 @@ struct topten_set {
     topten multi;
 };
 
-struct state_player_keys {
+struct player_keys {
     DikScancode gas;
     DikScancode brake;
     DikScancode right_volt;
@@ -40,11 +40,6 @@ struct state_player_keys {
     DikScancode toggle_minimap;
     DikScancode toggle_timer;
     DikScancode toggle_visibility; // Toggle Player
-};
-
-struct player_keys : state_player_keys {
-    DikScancode alovolt;
-    DikScancode brake_alias;
 };
 
 class state {

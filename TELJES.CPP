@@ -73,8 +73,6 @@ void teljes(void) {
         external_error("memory");
     }
 
-    State->keys1.alovolt = EolSettings->alovolt_key_player_a();
-
     mergestatedat();
 
     init_physics_data();
