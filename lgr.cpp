@@ -548,7 +548,10 @@ lgrfile::lgrfile(const char* lgrname) {
         continue;                                                                                  \
     }
 
-        LOAD_AFFINE("q1body.pcx", bike1.body);
+        if (strcmpi(asset_filename, "q1body.pcx") == 0) {
+            bike1.body = asset_pic;
+            continue;
+        }
         LOAD_AFFINE("q1thigh.pcx", bike1.thigh);
         LOAD_AFFINE("q1leg.pcx", bike1.leg);
         LOAD_AFFINE("q1wheel.pcx", bike1.wheel);
@@ -558,7 +561,10 @@ lgrfile::lgrfile(const char* lgrname) {
         LOAD_AFFINE("q1up_arm.pcx", bike1.up_arm);
         LOAD_AFFINE("q1head.pcx", bike1.head);
 
-        LOAD_AFFINE("q2body.pcx", bike2.body);
+        if (strcmpi(asset_filename, "q2body.pcx") == 0) {
+            bike2.body = asset_pic;
+            continue;
+        }
         LOAD_AFFINE("q2thigh.pcx", bike2.thigh);
         LOAD_AFFINE("q2leg.pcx", bike2.leg);
         LOAD_AFFINE("q2wheel.pcx", bike2.wheel);
@@ -567,7 +573,6 @@ lgrfile::lgrfile(const char* lgrname) {
         LOAD_AFFINE("q2forarm.pcx", bike2.forarm);
         LOAD_AFFINE("q2up_arm.pcx", bike2.up_arm);
         LOAD_AFFINE("q2head.pcx", bike2.head);
-
         LOAD_AFFINE("qflag.pcx", flag);
 #undef LOAD_AFFINE
 

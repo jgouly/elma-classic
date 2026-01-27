@@ -59,7 +59,7 @@ double Hatarx1, Hatarx2, Hatary1, Hatary2;
 static int Viewxsize, Viewysize;
 static int Viewxorig, Viewxtolas;
 
-affine_pic* shirt = nullptr;
+pic8* shirt = nullptr;
 
 void init_shirt() {
     constexpr int SHIRT_BMP_WIDTH = 149;
@@ -68,7 +68,7 @@ void init_shirt() {
     pic8* pic_shirt = pic8::from_bmp("bmp/shirt.bmp");
     if (pic_shirt && pic_shirt->get_width() == SHIRT_BMP_WIDTH &&
         pic_shirt->get_height() == SHIRT_BMP_HEIGHT) {
-        shirt = new affine_pic(nullptr, pic_shirt);
+        shirt = pic_shirt;
         return;
     }
 
@@ -159,7 +159,7 @@ void forditkepet(pic8* ppic) {
 
 // Meg nem affin koordok:
 static void kidoboz(vect2 a, vect2 b, pic8* ppic8, double szelesseg, affine_pic* pk, double tulloga,
-                    double tullogb, int tukor = 0) {
+                    double tullogb, int tukor = 0, pic8* zz = nullptr) {
     vect2 vegys = unit_vector(b - a);
     b = b + vegys * tullogb;
     a = a - vegys * tulloga;
@@ -178,7 +178,7 @@ static void kidoboz(vect2 a, vect2 b, pic8* ppic8, double szelesseg, affine_pic*
     v.y *= MetersToPixels;
     v2fel.x *= MetersToPixels;
     v2fel.y *= MetersToPixels;
-    draw_affine_pic(ppic8, pk, v, v2fel * 2.0, a);
+    draw_affine_pic(ppic8, pk, v, v2fel * 2.0, a, zz);
 }
 
 // radius meg nincs megszorozva:
@@ -202,7 +202,7 @@ static void kitag(pic8* ppic8, affine_pic* pk, bike_box* pb) {
     vect2 u = Miar * (pb->x2 - pb->x1);
     vect2 v = Mjar * (pb->y1 - pb->y2);
 
-    draw_affine_pic(ppic8, pk, u, v, r);
+    draw_affine_pic(ppic8, pk, u, v, r, nullptr);
 }
 
 static void kigyuru(pic8* ppic8, int x, int y, unsigned char szin) {
@@ -401,7 +401,7 @@ int Voltkilogas = 0;
 #endif
 
 static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmot, valtozok* pvalt,
-                   bike_pics* pmk, affine_pic* shirt) {
+                   bike_pics* pmk, pic8* shirt) {
 
     // Mivel ezeket fv megvaltoztatja:
     double ugrasnagysag = pvalt->ugrasnagysag;
@@ -616,8 +616,8 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     kidoboz(p_labfej, p_terd, ppic, 0.21, pmk->leg, 0.03, 0.03, pmot->flipped_bike);
 
     // Vezeto:
-    affine_pic* body = shirt ? shirt : pmk->body;
-    kidoboz(p_csipo, p_valltest, ppic, 0.2, body, 0.1, 0.05, pmot->flipped_bike);
+    kidoboz(p_csipo, p_valltest, ppic, 0.2, nullptr, 0.1, 0.05, pmot->flipped_bike,
+            shirt ?: pmk->body);
 
     // Kez:
     kidoboz(p_konyok, p_vall, ppic, 0.11, pmk->up_arm, 0.08, 0.1, !pmot->flipped_bike);

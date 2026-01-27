@@ -49,7 +49,7 @@ struct bike_pics {
     affine_pic* bike_part2;
     affine_pic* bike_part3;
     affine_pic* bike_part4;
-    affine_pic* body;
+    pic8* body;
     affine_pic* thigh;
     affine_pic* leg;
     affine_pic* wheel;

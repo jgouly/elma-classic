@@ -5,6 +5,7 @@
 #include "platform_utils.h"
 #include "qopen.h"
 #include <algorithm>
+#include <cassert>
 #include <cstring>
 #include <cstdlib>
 
@@ -16,7 +17,7 @@ void pic8::allocate(int w, int h) {
     width = short(w);
     height = short(h);
     if (w % 4) {
-        w += 4 - w % 4;
+        //   w += 4 - w % 4;
     }
     if (w <= 0 || h <= 0) {
         internal_error("pic8 invalid width/height!");

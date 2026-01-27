@@ -25,11 +25,11 @@ class pic8 {
     int width;
     int height;
     unsigned char** rows;
-    unsigned char* pixels;
     unsigned char* transparency_data;
     unsigned short transparency_data_length;
 
   public:
+    unsigned char* pixels;
     pic8(int w, int h);
     pic8(const char* filename, FILE* h = nullptr);
     static pic8* from_bmp(const char* filename);
