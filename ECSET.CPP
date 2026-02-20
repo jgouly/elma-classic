@@ -18,8 +18,6 @@
 #include <cmath>
 #include <cstring>
 
-typedef uintptr_t pixelek_t;
-
 canvas* CanvasBack = nullptr;
 canvas* CanvasFront = nullptr;
 canvas* CanvasMinimap = nullptr;
@@ -28,8 +26,6 @@ constexpr int RIGHTMOST_CHUNK_WIDTH = 1000000;
 
 constexpr int DISTANCE_DEFAULT = 1000000;
 constexpr int DISTANCE_SKY_CLIPPING_CORRECTION = 10000;
-
-#define PIXELMASZK (~((uintptr_t)0x7FF))
 
 static void memory_error() {
     external_error("You do not have enough memory to load this level!",
@@ -187,9 +183,9 @@ void canvas::draw_segment(segment* seg) {
         node->xpos = x;
         node->distance = DISTANCE_DEFAULT;
         if (line_direction_negative) {
-            node->pixels = (unsigned char*)PixelsDefaultForeground;
+            node->pixels = canvas_pixels::Enum::DefaultForeground;
         } else {
-            node->pixels = (unsigned char*)PixelsDefaultBackground;
+            node->pixels = canvas_pixels::Enum::DefaultBackground;
         }
 
         // Append it to the end of the linked list (linked list is currently not in order)
@@ -254,7 +250,7 @@ static void sort_xpos_and_merge(canvas_chunk_node* row_nodes) {
                 cur_node->xpos = next_node->xpos;
                 next_node->xpos = tmp_xpos;
 
-                unsigned char* tmp_pixels = cur_node->pixels;
+                canvas_pixels tmp_pixels = cur_node->pixels;
                 cur_node->pixels = next_node->pixels;
                 next_node->pixels = tmp_pixels;
             }
@@ -313,7 +309,7 @@ void canvas::default_foreground_to_pointers() {
         }
         while (cur_node) {
             // Make sure width doesn't exceed the width in generate_default_texture()
-            if ((pixelek_t)cur_node->pixels == PixelsDefaultForeground &&
+            if (cur_node->pixels == canvas_pixels::Enum::DefaultForeground &&
                 cur_node->width < SCREEN_WIDTH) {
                 int x = xpos % Lgr->foreground_original_width;
                 int y = i % Lgr->foreground->get_height();
@@ -334,8 +330,7 @@ void canvas::merge_redundant_chunks() {
             while (cur_node && cur_node->next) {
                 canvas_chunk_node* next_node = cur_node->next;
                 // Merge enums and textures only
-                if (((pixelek_t)cur_node->pixels & PIXELMASZK) == 0 &&
-                    cur_node->pixels == next_node->pixels) {
+                if (!cur_node->pixels.is_pointer() && cur_node->pixels == next_node->pixels) {
                     cur_node->next = next_node->next;
                     cur_node->width += next_node->width;
                     again = true;
@@ -357,9 +352,8 @@ void canvas::textures_to_pointers() {
         while (cur_node) {
             int original_width = cur_node->width;
             // Convert textures to raw pixel data
-            pixelek_t texture_index = (pixelek_t)cur_node->pixels;
-            if (((texture_index & PIXELMASZK) == 0) && (texture_index >= 10)) {
-                texture_index -= 10;
+            if (cur_node->pixels.is_texture()) {
+                int texture_index = cur_node->pixels.to_texture();
 #ifdef DEBUG
                 if (texture_index >= Lgr->texture_count) {
                     internal_error(
@@ -392,8 +386,8 @@ void canvas::textures_to_pointers() {
 
                     cur_node->width = node_width;
                     cur_node->pixels = pic->get_row(y % pic->get_height()) + texture_x_offset;
-                    if (((pixelek_t)cur_node->pixels & PIXELMASZK) == 0) {
-                        external_error("Memory address is less than 2048 (723)!");
+                    if (!cur_node->pixels.is_pointer()) {
+                        external_error("textures_to_pointers pointer has invalid memory address!");
                     }
 
                     texture_x_offset += node_width;
@@ -466,23 +460,23 @@ void canvas::calculate_object_positions() {
 }
 
 // source must be aligned to a single chunk.
-canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char* source,
-                                          int dest_x, int source_x_left, int source_x_right,
-                                          int source_dist, canvas_chunk_node* dest_prev,
-                                          bool* prev_can_merge, Clipping clipping) {
+canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, canvas_pixels source, int dest_x,
+                                          int source_x_left, int source_x_right, int source_dist,
+                                          canvas_chunk_node* dest_prev, bool* prev_can_merge,
+                                          Clipping clipping) {
 
-    if ((pixelek_t)source == PixelsTransparent) {
+    if (source == canvas_pixels::Enum::Transparent) {
         internal_error("canvas::draw_one_chunk source is transparent!");
     }
     // Transparent pixels are only specifically used for the front canvas, so enforce this usage
-    if ((pixelek_t)dest->pixels == PixelsTransparent && clipping != Clipping::Transparent) {
+    if (dest->pixels == canvas_pixels::Enum::Transparent && clipping != Clipping::Transparent) {
         internal_error("canvas::draw_one_chunk",
                        "dest is transparent but clipping is not transparent!");
     }
 
     // Validate whether we want to draw based on clipping
     if (clipping == Clipping::Ground) {
-        if ((pixelek_t)dest->pixels == PixelsDefaultBackground) {
+        if (dest->pixels == canvas_pixels::Enum::DefaultBackground) {
             *prev_can_merge = false;
             return dest;
         }
@@ -491,15 +485,15 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         // Background distance needs to be temporarily modified as Sky clipping should never draw on
         // top of Ground clipping
         source_dist += DISTANCE_SKY_CLIPPING_CORRECTION;
-        if ((pixelek_t)dest->pixels == PixelsDefaultForeground) {
+        if (dest->pixels == canvas_pixels::Enum::DefaultForeground) {
             *prev_can_merge = false;
             return dest;
         }
     }
     if (clipping == Clipping::Transparent) {
         // Transparent pixels are only specifically used for the front canvas, so enforce this usage
-        if ((pixelek_t)dest->pixels == PixelsDefaultForeground ||
-            (pixelek_t)dest->pixels == PixelsDefaultBackground) {
+        if (dest->pixels == canvas_pixels::Enum::DefaultForeground ||
+            dest->pixels == canvas_pixels::Enum::DefaultBackground) {
             internal_error("canvas::draw_one_chunk",
                            "dest is non-transparent but clipping is transparent!");
         }
@@ -553,7 +547,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         }
         // Check if prev chunk is a matching texture, in which case we merge with prev chunk
         if (!(*prev_can_merge) && dest_prev->distance == source_dist &&
-            !((pixelek_t)dest_prev->pixels & PIXELMASZK) && dest_prev->pixels == source) {
+            !dest_prev->pixels.is_pointer() && dest_prev->pixels == source) {
             *prev_can_merge = true;
         }
         if (*prev_can_merge) {
@@ -561,9 +555,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
             int insertion_width = source_x_right - source_x_left + 1;
             dest_prev->width += insertion_width;
             dest->width -= insertion_width;
-            if ((pixelek_t)dest->pixels & PIXELMASZK) {
-                dest->pixels += insertion_width;
-            }
+            dest->pixels += insertion_width;
 
             *prev_can_merge = false;
             return dest;
@@ -578,9 +570,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
             node->next = dest;
 
             dest->width -= node->width;
-            if ((pixelek_t)dest->pixels & PIXELMASZK) {
-                dest->pixels += node->width;
-            }
+            dest->pixels += node->width;
 
             *prev_can_merge = false;
             return dest;
@@ -597,7 +587,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         }
         // Check if prev chunk is a matching texture, in which case we merge with prev chunk
         if (!(*prev_can_merge) && dest_prev->distance == source_dist &&
-            !((pixelek_t)dest_prev->pixels & PIXELMASZK) && dest_prev->pixels == source) {
+            !dest_prev->pixels.is_pointer() && dest_prev->pixels == source) {
             *prev_can_merge = true;
         }
         if (*prev_can_merge) {
@@ -632,11 +622,8 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         node_middle->next = node_right;
 
         node_right->width = dest_x_right - source_x_right;
-        if ((pixelek_t)dest->pixels & PIXELMASZK) {
-            node_right->pixels = dest->pixels + (source_x_right + 1 - dest_x);
-        } else {
-            node_right->pixels = dest->pixels;
-        }
+        node_right->pixels = dest->pixels;
+        node_right->pixels += source_x_right + 1 - dest_x;
         node_right->distance = dest->distance;
         node_right->next = dest->next;
 
@@ -651,7 +638,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
     return nullptr;
 }
 
-void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int x_right, int y,
+void canvas::draw_pixels(canvas_pixels source, int source_dist, int x_left, int x_right, int y,
                          Clipping clipping) {
     // Make sure canvas is unused so far
     canvas_chunk_node* cur_node = rows_linked[y];
@@ -686,14 +673,12 @@ void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int
         }
 
         // Offset the source data if it is a pointer to pixel data
-        unsigned char* source_next = source;
-        if ((pixelek_t)source_next & PIXELMASZK) {
-            int left_skip = 0;
-            if (x_left > xpos_left) {
-                left_skip = x_left - xpos_left;
-            }
-            source_next = source + (cur_node->width - left_skip);
+        canvas_pixels source_next = source;
+        int left_skip = 0;
+        if (x_left > xpos_left) {
+            left_skip = x_left - xpos_left;
         }
+        source_next += cur_node->width - left_skip;
 
         // Draw
         int xpos_next = xpos + cur_node->width;
@@ -728,7 +713,7 @@ void canvas::draw_texture(sprite* spr, int texture_index, int mask_index, Clippi
         int j = 0;
         while (msk->data[offset].type != MaskEncoding::EndOfLine) {
             if (msk->data[offset].type == MaskEncoding::Solid) {
-                draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x + j,
+                draw_pixels(canvas_pixels(texture_index), distance, x + j,
                             x + j + msk->data[offset].length - 1, y - i, clipping);
             }
             j += msk->data[offset].length;
@@ -788,8 +773,8 @@ void canvas::draw_sprites(Clipping clipping) {
         }
 
         unsigned char* pixeldata = pict->data;
-        if (((pixelek_t)pixeldata & PIXELMASZK) == 0) {
-            external_error("Memory address is less than 2048 (987)!");
+        if (!canvas_pixels(pixeldata).is_pointer()) {
+            external_error("draw_sprites pointer has invalid memory address!");
         }
 
         // Draw the picture
@@ -894,8 +879,8 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) 
             if (count <= 0) {
                 internal_error("draw_qgrass_texture count <= 0");
             }
-            draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x + j,
-                        x + j + count - 1, y + i, Clipping::Ground);
+            draw_pixels(canvas_pixels(texture_index), distance, x + j, x + j + count - 1, y + i,
+                        Clipping::Ground);
             j += count;
         }
     }
@@ -903,8 +888,8 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) 
     // Add 20 pixels of height to grass
     int grass_height_padding = QGRASS_EXTRA_HEIGHT * EolSettings->zoom();
     for (int i = 0; i < grass_height_padding; i++) {
-        draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
-                    y + height + i, Clipping::Ground);
+        draw_pixels(canvas_pixels(texture_index), distance, x, x + width - 1, y + height + i,
+                    Clipping::Ground);
     }
 }
 
@@ -1136,7 +1121,7 @@ canvas::canvas(bool minimap) {
         rows_linked[i]->next = nullptr;
         rows_linked[i]->width = 1;
         rows_linked[i]->distance = DISTANCE_DEFAULT;
-        rows_linked[i]->pixels = (unsigned char*)PixelsDefaultForeground;
+        rows_linked[i]->pixels = canvas_pixels::Enum::DefaultForeground;
     }
 
     // Draw all the polygon data
@@ -1213,7 +1198,7 @@ canvas::canvas(canvas* reference) {
         rows_linked[i]->next = nullptr;
         rows_linked[i]->width = RIGHTMOST_CHUNK_WIDTH;
         rows_linked[i]->distance = DISTANCE_DEFAULT;
-        rows_linked[i]->pixels = (unsigned char*)PixelsTransparent;
+        rows_linked[i]->pixels = canvas_pixels::Enum::Transparent;
     }
 }
 
@@ -1293,22 +1278,18 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
     int offset = ViewLeftBorder - xpos;
     if (xpos + cur_chunk->width > ViewRightBorder) {
         int width = ViewRightBorder - xpos + 1;
-        if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-            memcpy(dest, &cur_chunk->pixels[ViewLeftBorder - xpos], width - offset);
+        if (cur_chunk->pixels.is_pointer()) {
+            memcpy(dest, &cur_chunk->pixels.to_pointer()[ViewLeftBorder - xpos], width - offset);
+        } else if (cur_chunk->pixels == canvas_pixels::Enum::DefaultBackground) {
+            draw_default_background(dest, 0, width - offset, is_minimap);
+        } else if (cur_chunk->pixels == canvas_pixels::Enum::DefaultForeground) {
+            draw_default_foreground(dest, 0, width - offset, is_minimap);
         } else {
-            if (!cur_chunk->pixels) {
-                draw_default_background(dest, 0, width - offset, is_minimap);
-                return;
-            }
-            if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
-                draw_default_foreground(dest, 0, width - offset, is_minimap);
-            } else {
 #ifdef DEBUG
-                if ((pixelek_t)cur_chunk->pixels != PixelsTransparent) {
-                    internal_error("cur_chunk->pixels unknown or texture type!");
-                }
-#endif
+            if (cur_chunk->pixels != canvas_pixels::Enum::Transparent) {
+                internal_error("cur_chunk->pixels unknown or texture type!");
             }
+#endif
         }
         return;
     }
@@ -1317,22 +1298,18 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
     // and the remaining chunks (all left-aligned)
     // First chunk (not left-aligned):
     int size = cur_chunk->width - offset;
-    if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-        memcpy(dest, &cur_chunk->pixels[ViewLeftBorder - xpos], size);
+    if (cur_chunk->pixels.is_pointer()) {
+        memcpy(dest, &cur_chunk->pixels.to_pointer()[ViewLeftBorder - xpos], size);
+    } else if (cur_chunk->pixels == canvas_pixels::Enum::DefaultBackground) {
+        draw_default_background(dest, 0, size, is_minimap);
+    } else if (cur_chunk->pixels == canvas_pixels::Enum::DefaultForeground) {
+        draw_default_foreground(dest, 0, size, is_minimap);
     } else {
-        if (!cur_chunk->pixels) {
-            draw_default_background(dest, 0, size, is_minimap);
-        } else {
-            if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
-                draw_default_foreground(dest, 0, size, is_minimap);
-            } else {
 #ifdef DEBUG
-                if ((pixelek_t)cur_chunk->pixels != PixelsTransparent) {
-                    internal_error("cur_chunk->pixels unknown or texture type!");
-                }
-#endif
-            }
+        if (cur_chunk->pixels != canvas_pixels::Enum::Transparent) {
+            internal_error("cur_chunk->pixels unknown or texture type!");
         }
+#endif
     }
     xpos += cur_chunk->width;
     cur_chunk++;
@@ -1342,45 +1319,37 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
     while (xpos <= ViewRightBorder) {
         // Last chunk (not right-aligned)
         if (xpos + cur_chunk->width > ViewRightBorder) {
-            if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-                memcpy(dest, cur_chunk->pixels, ViewRightBorder - xpos + 1);
-                return;
-            }
-            if (!cur_chunk->pixels) {
+            if (cur_chunk->pixels.is_pointer()) {
+                memcpy(dest, cur_chunk->pixels.to_pointer(), ViewRightBorder - xpos + 1);
+            } else if (cur_chunk->pixels == canvas_pixels::Enum::DefaultBackground) {
                 draw_default_background(dest, xpos - ViewLeftBorder, ViewRightBorder - xpos + 1,
                                         is_minimap);
-                return;
-            }
-            if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
+            } else if (cur_chunk->pixels == canvas_pixels::Enum::DefaultForeground) {
                 draw_default_foreground(dest, xpos - ViewLeftBorder, ViewRightBorder - xpos + 1,
                                         is_minimap);
-                return;
-            }
+            } else {
 #ifdef DEBUG
-            if ((pixelek_t)cur_chunk->pixels != PixelsTransparent) {
-                internal_error("cur_chunk->pixels unknown or texture type!");
-            }
+                if (cur_chunk->pixels != canvas_pixels::Enum::Transparent) {
+                    internal_error("cur_chunk->pixels unknown or texture type!");
+                }
 #endif
+            }
+            return;
         }
 
         // Middle chunk (left- and right-aligned)
-        if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-            memcpy(dest, cur_chunk->pixels, cur_chunk->width);
+        if (cur_chunk->pixels.is_pointer()) {
+            memcpy(dest, cur_chunk->pixels.to_pointer(), cur_chunk->width);
+        } else if (cur_chunk->pixels == canvas_pixels::Enum::DefaultBackground) {
+            draw_default_background(dest, xpos - ViewLeftBorder, cur_chunk->width, is_minimap);
+        } else if (cur_chunk->pixels == canvas_pixels::Enum::DefaultForeground) {
+            draw_default_foreground(dest, xpos - ViewLeftBorder, cur_chunk->width, is_minimap);
         } else {
-            if (!cur_chunk->pixels) {
-                draw_default_background(dest, xpos - ViewLeftBorder, cur_chunk->width, is_minimap);
-            } else {
-                if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
-                    draw_default_foreground(dest, xpos - ViewLeftBorder, cur_chunk->width,
-                                            is_minimap);
-                } else {
 #ifdef DEBUG
-                    if ((pixelek_t)cur_chunk->pixels != PixelsTransparent) {
-                        internal_error("cur_chunk->pixels unknown or texture type!");
-                    }
-#endif
-                }
+            if (cur_chunk->pixels != canvas_pixels::Enum::Transparent) {
+                internal_error("cur_chunk->pixels unknown or texture type!");
             }
+#endif
         }
         xpos += cur_chunk->width;
         dest += cur_chunk->width;
@@ -1473,8 +1442,7 @@ static bool above_is_front(int x, int y, node_finder* finder) {
         internal_error("above_is_front no reference");
     }
     canvas_chunk_node* chunk = finder->get_chunk(x, y + 1);
-    pixelek_t kepindex = (pixelek_t)chunk->pixels;
-    if (kepindex < 10) {
+    if (chunk->pixels.is_enum()) {
         return false;
     }
     if (chunk->pixels == QgrassTextureId->pixels) {
@@ -1537,15 +1505,14 @@ void canvas::create_front_grass() {
             QgrassTextureId = cur_node;
 
             // Only parse back grass
-            pixelek_t kepindex = (pixelek_t)cur_node->pixels;
-            if (((kepindex & PIXELMASZK) == 0) && (kepindex >= 10)) {
-                kepindex -= 10;
+            if (cur_node->pixels.is_texture()) {
+                int texture_index = cur_node->pixels.to_texture();
 #ifdef DEBUG
-                if (kepindex >= Lgr->texture_count) {
+                if (texture_index >= Lgr->texture_count) {
                     internal_error("create_front_grass texture id out of range!");
                 }
 #endif
-                texture* text = &Lgr->textures[kepindex];
+                texture* text = &Lgr->textures[texture_index];
                 if (text->is_qgrass && cur_node->distance > 500) {
                     // Check to see if the qgrass is touching any front sprites
                     int x1 = xpos;
@@ -1617,12 +1584,12 @@ void canvas::create_canvases() {
 
             while (cur_node) {
                 if (cur_node->distance < 500) {
-                    if ((pixelek_t)cur_node->pixels >= 10) {
+                    if (!cur_node->pixels.is_enum()) {
                         CanvasFront->draw_pixels(cur_node->pixels, cur_node->distance, xpos,
                                                  xpos + cur_node->width - 1, i,
                                                  Clipping::Transparent);
                         // Delete from back canvas
-                        cur_node->pixels = (unsigned char*)PixelsTransparent;
+                        cur_node->pixels = canvas_pixels::Enum::Transparent;
                     }
                 }
                 xpos += cur_node->width;
