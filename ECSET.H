@@ -1,8 +1,11 @@
 #ifndef ECSET_H
 #define ECSET_H
 
+#include "lgr.h"
+#include "main.h"
 #include "sprite.h"
 #include "vect2.h"
+#include <cstdint>
 
 class canvas;
 class grass;
@@ -27,6 +30,90 @@ class node_finder {
 #define PixelsDefaultBackground (0)
 #define PixelsDefaultForeground (1)
 #define PixelsTransparent (2)
+
+class canvas_pixels {
+  public:
+    enum class Enum : uintptr_t {
+        DefaultBackground,
+        DefaultForeground,
+        Transparent,
+    };
+
+    static constexpr uintptr_t ENUM_END = 10;
+    static constexpr uintptr_t TEXTURE_START = ENUM_END;
+    static constexpr uintptr_t TEXTURE_END = TEXTURE_START + MAX_TEXTURES;
+    static constexpr uintptr_t POINTER_START = 0x800;
+    static_assert(TEXTURE_END < POINTER_START);
+
+  private:
+    uintptr_t value;
+
+  public:
+    canvas_pixels()
+        : value(static_cast<uintptr_t>(Enum::DefaultBackground)) {}
+
+    constexpr canvas_pixels(Enum e)
+        : value(static_cast<uintptr_t>(e)) {}
+
+    canvas_pixels(int texture_index)
+        : value(TEXTURE_START + texture_index) {
+#ifdef DEBUG
+        if (!is_texture()) {
+            internal_error("canvas_pixels invalid texture constructor");
+        }
+#endif
+    }
+
+    canvas_pixels(unsigned char* ptr)
+        : value(reinterpret_cast<uintptr_t>(ptr)) {}
+
+    bool is_pointer() const { return value >= POINTER_START; }
+
+    bool is_enum() const { return value < ENUM_END; }
+
+    bool is_texture() const { return !is_pointer() && !is_enum(); }
+
+    int to_texture() const {
+#ifdef DEBUG
+        if (!is_texture()) {
+            internal_error("to_pixels to_texture() called on invalid value");
+        }
+#endif
+        return static_cast<int>(value - TEXTURE_START);
+    }
+
+    unsigned char* to_pointer() const {
+#ifdef DEBUG
+        if (!is_pointer()) {
+            internal_error("to_pixels to_pointer() called on invalid value");
+        }
+#endif
+        return reinterpret_cast<unsigned char*>(value);
+    }
+
+    constexpr bool operator==(Enum e) const { return value == static_cast<uintptr_t>(e); }
+
+    constexpr bool operator!=(Enum e) const { return value != static_cast<uintptr_t>(e); }
+
+    constexpr bool operator==(canvas_pixels o) const { return value == o.value; }
+
+    constexpr bool operator!=(canvas_pixels o) const { return value != o.value; }
+
+    canvas_pixels operator+(int offset) const {
+        if (!is_pointer()) {
+            return *this;
+        }
+        return canvas_pixels(value + static_cast<uintptr_t>(offset));
+    }
+
+    canvas_pixels& operator+=(int offset) {
+        if (!is_pointer()) {
+            return *this;
+        }
+        value += static_cast<uintptr_t>(offset);
+        return *this;
+    }
+};
 
 // Horizontal segment of pixels sharing the same source of pixel data, chained
 // together to make one row of the rendered level.
