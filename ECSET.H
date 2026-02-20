@@ -209,6 +209,7 @@ class canvas {
 
     // Render
     void render_row(bool player1, unsigned char* dest, int y);
+    void assert_has_never_rendered(int row);
 
     void create_front_grass();
 

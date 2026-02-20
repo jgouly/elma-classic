@@ -301,12 +301,10 @@ static void sort_xpos_and_merge(canvas_chunk_node* row_nodes) {
 
 void canvas::default_foreground_to_pointers() {
     for (int i = 0; i < pixel_height; i++) {
+        assert_has_never_rendered(i);
+
         canvas_chunk_node* cur_node = rows_linked[i];
-        // Make sure canvas is unused so far
         int xpos = rows_x1[i];
-        if (xpos > 100) {
-            internal_error("canvas::default_foreground_to_pointers xpos > 100!");
-        }
         while (cur_node) {
             // Make sure width doesn't exceed the width in generate_default_texture()
             if (cur_node->pixels == canvas_pixels::Enum::DefaultForeground &&
@@ -343,12 +341,10 @@ void canvas::merge_redundant_chunks() {
 
 void canvas::textures_to_pointers() {
     for (int y = 0; y < pixel_height; y++) {
+        assert_has_never_rendered(y);
+
         canvas_chunk_node* cur_node = rows_linked[y];
-        // Make sure canvas is unused so far
         int xpos = rows_x1[y];
-        if (xpos > 100) {
-            internal_error("canvas::textures_to_pointers xpos > 100");
-        }
         while (cur_node) {
             int original_width = cur_node->width;
             // Convert textures to raw pixel data
@@ -640,12 +636,11 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, canvas_pixels
 
 void canvas::draw_pixels(canvas_pixels source, int source_dist, int x_left, int x_right, int y,
                          Clipping clipping) {
-    // Make sure canvas is unused so far
+    assert_has_never_rendered(y);
+
     canvas_chunk_node* cur_node = rows_linked[y];
     int xpos = rows_x1[y];
-    if (xpos > 10) {
-        internal_error("canvas::draw_pixels xpos > 10!");
-    }
+
     // Find the first chunk onto which we will draw
     canvas_chunk_node* prev_node = nullptr;
     while (xpos + cur_node->width - 1 < x_left) {
@@ -1357,6 +1352,13 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
     }
 }
 
+void canvas::assert_has_never_rendered(int row) {
+    int xpos = rows_x1[row];
+    if (xpos > 100) {
+        internal_error("has_never_rendered assertion failed!");
+    }
+}
+
 void canvas::meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y) {
     vect2 dr = meters - origin;
     if (is_minimap) {
@@ -1491,14 +1493,10 @@ void canvas::create_front_grass() {
 
     // For each row
     for (int i = 10; i < pixel_height - 10; i++) {
+        assert_has_never_rendered(i);
+
         canvas_chunk_node* cur_node = rows_linked[i];
         int xpos = rows_x1[i];
-
-        // Make sure canvas is unused so far
-        if (xpos > 10) {
-            internal_error("create_front_grass xpos > 10");
-        }
-
         while (cur_node) {
             int node_width = cur_node->width;
             canvas_chunk_node* next_node = cur_node->next;
@@ -1574,13 +1572,10 @@ void canvas::create_canvases() {
     if (!EolSettings->pictures_in_background()) {
         // Move over everything with a distance of less than 500
         for (int i = 0; i < CanvasBack->pixel_height; i++) {
+            CanvasBack->assert_has_never_rendered(i);
+
             canvas_chunk_node* cur_node = CanvasBack->rows_linked[i];
             int xpos = CanvasBack->rows_x1[i];
-
-            // Make sure canvas is unused so far
-            if (xpos > 100) {
-                internal_error("create_canvases xpos > 100!");
-            }
 
             while (cur_node) {
                 if (cur_node->distance < 500) {
