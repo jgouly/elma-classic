@@ -29,50 +29,41 @@ class node_finder {
 
 class canvas_pixels {
   public:
-    enum class Enum : uintptr_t {
-        DefaultBackground,
-        DefaultForeground,
-        Transparent,
-    };
-
-    static constexpr uintptr_t ENUM_END = 10;
-    static constexpr uintptr_t TEXTURE_START = ENUM_END;
-    static constexpr uintptr_t TEXTURE_END = TEXTURE_START + MAX_TEXTURES;
-    static constexpr uintptr_t POINTER_START = 0x800;
-    static_assert(TEXTURE_END < POINTER_START);
-
-  private:
-    uintptr_t value;
-
-  public:
     canvas_pixels()
-        : value(static_cast<uintptr_t>(Enum::DefaultBackground)) {}
+        : value(0) {}
 
-    constexpr canvas_pixels(Enum e)
-        : value(static_cast<uintptr_t>(e)) {}
+    static constexpr canvas_pixels default_background() { return canvas_pixels(0); }
+    static constexpr canvas_pixels default_foreground() { return canvas_pixels(1); }
+    static constexpr canvas_pixels transparent() { return canvas_pixels(2); }
 
-    canvas_pixels(int texture_index)
-        : value(TEXTURE_START + texture_index) {
+    static canvas_pixels texture(int texture_index) {
+        canvas_pixels texture(TEXTURE_START + texture_index);
 #ifdef DEBUG
-        if (!is_texture()) {
+        if (!texture.is_texture()) {
             internal_error("canvas_pixels invalid texture constructor");
         }
 #endif
+        return texture;
     }
 
-    canvas_pixels(unsigned char* ptr)
-        : value(reinterpret_cast<uintptr_t>(ptr)) {}
+    static canvas_pixels pointer(unsigned char* ptr) {
+        canvas_pixels pointer(reinterpret_cast<uintptr_t>(ptr));
+#ifdef DEBUG
+        if (!pointer.is_pointer()) {
+            internal_error("canvas_pixels invalid pointer constructor");
+        }
+#endif
+        return pointer;
+    }
 
     bool is_pointer() const { return value >= POINTER_START; }
-
     bool is_enum() const { return value < ENUM_END; }
-
-    bool is_texture() const { return !is_pointer() && !is_enum(); }
+    bool is_texture() const { return value >= TEXTURE_START && value < TEXTURE_END; }
 
     int to_texture() const {
 #ifdef DEBUG
         if (!is_texture()) {
-            internal_error("to_pixels to_texture() called on invalid value");
+            internal_error("to_texture() called on invalid value");
         }
 #endif
         return static_cast<int>(value - TEXTURE_START);
@@ -81,34 +72,32 @@ class canvas_pixels {
     unsigned char* to_pointer() const {
 #ifdef DEBUG
         if (!is_pointer()) {
-            internal_error("to_pixels to_pointer() called on invalid value");
+            internal_error("to_pointer() called on invalid value");
         }
 #endif
         return reinterpret_cast<unsigned char*>(value);
     }
 
-    constexpr bool operator==(Enum e) const { return value == static_cast<uintptr_t>(e); }
-
-    constexpr bool operator!=(Enum e) const { return value != static_cast<uintptr_t>(e); }
-
-    constexpr bool operator==(canvas_pixels o) const { return value == o.value; }
-
-    constexpr bool operator!=(canvas_pixels o) const { return value != o.value; }
-
-    canvas_pixels operator+(int offset) const {
-        if (!is_pointer()) {
-            return *this;
-        }
-        return canvas_pixels(value + static_cast<uintptr_t>(offset));
-    }
+    constexpr friend bool operator==(canvas_pixels, canvas_pixels) = default;
 
     canvas_pixels& operator+=(int offset) {
-        if (!is_pointer()) {
-            return *this;
+        if (is_pointer()) {
+            value += static_cast<uintptr_t>(offset);
         }
-        value += static_cast<uintptr_t>(offset);
         return *this;
     }
+
+  private:
+    static constexpr uintptr_t ENUM_END = 10;
+    static constexpr uintptr_t TEXTURE_START = ENUM_END;
+    static constexpr uintptr_t TEXTURE_END = TEXTURE_START + MAX_TEXTURES;
+    static constexpr uintptr_t POINTER_START = 0x800;
+    static_assert(TEXTURE_END < POINTER_START);
+
+    uintptr_t value;
+
+    constexpr explicit canvas_pixels(uintptr_t v) noexcept
+        : value(v) {}
 };
 
 // Horizontal segment of pixels sharing the same source of pixel data, chained
