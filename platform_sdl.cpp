@@ -41,6 +41,8 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
     }
 
     int window_flags = EolSettings->renderer() == RendererType::OpenGL ? SDL_WINDOW_OPENGL : 0;
+    window_flags |= SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_FULLSCREEN_DESKTOP;
+    window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     SDLWindow =
         SDL_CreateWindow("Elasto Mania", window_pos_x, window_pos_y, width, height, window_flags);
@@ -48,6 +50,13 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
         internal_error(SDL_GetError());
         return;
     }
+
+    // int width2;
+    // int height2;
+    // SDL_GL_GetDrawableSize(SDLWindow, &width2, &height2);
+    // SCREEN_WIDTH = width2;
+    // SCREEN_HEIGHT = height2;
+    hide_cursor();
 }
 
 static void initialize_renderer() {
@@ -198,7 +207,20 @@ void unlock_backbuffer() {
         gl_present();
         SDL_GL_SwapWindow(SDLWindow);
     } else {
-        SDL_BlitSurface(SDLSurfacePaletted, NULL, SDLSurfaceMain, NULL);
+        int window_w;
+        int window_h;
+        SDL_GetWindowSize(SDLWindow, &window_w, &window_h);
+
+        SDL_Rect dest;
+
+        dest.w = SCREEN_WIDTH;
+        dest.h = SCREEN_HEIGHT;
+        dest.x = (window_w - SCREEN_WIDTH) / 2;
+        dest.y = (window_h - SCREEN_HEIGHT) / 2;
+
+        SDL_FillRect(SDLSurfaceMain, NULL, 0); // black border
+        SDL_BlitSurface(SDLSurfacePaletted, NULL, SDLSurfaceMain, &dest);
+
         SDL_UpdateWindowSurface(SDLWindow);
     }
 }
@@ -314,7 +336,11 @@ void handle_events() {
 }
 
 void hide_cursor() { SDL_ShowCursor(SDL_DISABLE); }
-void show_cursor() { SDL_ShowCursor(SDL_ENABLE); }
+void show_cursor() {
+    if (!is_fullscreen()) {
+        SDL_ShowCursor(SDL_ENABLE);
+    }
+}
 
 void get_mouse_position(int* x, int* y) { SDL_GetMouseState(x, y); }
 void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }

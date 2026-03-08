@@ -174,7 +174,14 @@ int gl_init(SDL_Window* sdl_window, int width, int height, int pitch) {
     glDisable(GL_CULL_FACE);
     glDisable(GL_DITHER);
 
-    glViewport(0, 0, width, height);
+    int window_w;
+    int window_h;
+    SDL_GL_GetDrawableSize(sdl_window, &window_w, &window_h);
+
+    glViewport((window_w - width) / 2, (window_h - height) / 2, width, height);
+
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     // Disable VSync
     SDL_GL_SetSwapInterval(0);
@@ -223,9 +230,9 @@ void gl_update_palette(const void* palette) {
 void gl_present() { glDrawArrays(GL_TRIANGLES, 0, 6); }
 
 int gl_resize(int width, int height, int pitch) {
-    FrameWidth = width;
-    FrameHeight = height;
-    glViewport(0, 0, width, height);
+    // FrameWidth = width;
+    // FrameHeight = height;
+    // glViewport(0, 0, width, height);
 
     // Resize index texture
     glActiveTexture(GL_TEXTURE0);
