@@ -18,6 +18,7 @@
 #include "platform/implementation.h"
 #include "platform/scancode.h"
 #include "platform/sdl/keyboard.h"
+#include "renderer/canvas.h"
 #include "renderer/render.h"
 #include "renderer/timer.h"
 #include "sound/engine.h"
@@ -574,8 +575,16 @@ static void handle_eol_inputs() {
     }
 }
 
+void reload_graphical_assets() {
+    if (ReloadCanvas) {
+        canvas::create_canvases();
+    }
+}
+
 // Common setup function
 static void setup_gameloop(const char* filename) {
+    reload_graphical_assets();
+
     load_best_time(filename, Single);
 
     init_physics_data();
