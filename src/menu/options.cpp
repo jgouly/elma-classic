@@ -1,6 +1,5 @@
 #include "menu/options.h"
 #include "eol/settings.h"
-#include "game/level_load.h"
 #include "game/state.h"
 #include "main.h"
 #include "menu/ball.h"
@@ -11,6 +10,7 @@
 #include "menu/player.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "renderer/canvas.h"
 #include "util/file_iter.h"
 #include <cmath>
 #include <cstring>
@@ -247,7 +247,7 @@ void menu_options() {
         nav.add_row(
             "Video Detail:", State->high_quality ? "High" : "Low", NAV_FUNC() {
                 State->high_quality = !State->high_quality;
-                invalidate_level();
+                canvas::invalidate_canvas();
             });
 
         nav.add_row(
