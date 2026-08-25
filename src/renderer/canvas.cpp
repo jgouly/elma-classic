@@ -24,6 +24,8 @@ canvas* CanvasBack = nullptr;
 canvas* CanvasFront = nullptr;
 canvas* CanvasMinimap = nullptr;
 
+static bool CanvasesInvalidated = true;
+
 constexpr int RIGHTMOST_CHUNK_WIDTH = 1000000;
 
 constexpr int DISTANCE_DEFAULT = 1000000;
@@ -1562,8 +1564,6 @@ void canvas::create_front_grass() {
 void canvas::create_canvases() {
     START_TIME(canvas_timer);
 
-    ReloadCanvas = false;
-
     Lgr->reload_default_textures(*Level, false);
 
     delete CanvasBack;
@@ -1639,6 +1639,8 @@ void canvas::create_canvases() {
     CanvasBack->calculate_object_positions();
     CanvasMinimap->calculate_object_positions();
 
+    CanvasesInvalidated = false;
+
     END_TIME(canvas_timer, std::format("Canvases"));
 }
 
@@ -1683,5 +1685,10 @@ bool canvas::bike_out_of_bounds(vect2 pos) {
     return relative_pos.x < OUT_OF_BOUNDS_LEFT || relative_pos.y < OUT_OF_BOUNDS_BOTTOM;
 }
 
-bool ReloadCanvas = true;
-void canvas::invalidate_canvas() { ReloadCanvas = true; }
+void canvas::invalidate_canvas() { CanvasesInvalidated = true; }
+
+void canvas::rebuild_canvases_if_needed() {
+    if (CanvasesInvalidated) {
+        create_canvases();
+    }
+}

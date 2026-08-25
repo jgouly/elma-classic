@@ -221,12 +221,11 @@ class canvas {
     // Generate all 3 canvasses required to render a level
     static void create_canvases();
     static void invalidate_canvas();
+    static void rebuild_canvases_if_needed();
 };
 
 extern canvas* CanvasBack;
 extern canvas* CanvasFront;
 extern canvas* CanvasMinimap;
-
-extern bool ReloadCanvas;
 
 #endif

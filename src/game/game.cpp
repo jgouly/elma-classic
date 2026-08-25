@@ -582,15 +582,9 @@ static void handle_eol_inputs() {
     }
 }
 
-void reload_graphical_assets() {
-    if (ReloadCanvas) {
-        canvas::create_canvases();
-    }
-}
-
 // Common setup function
 static void setup_gameloop(const char* filename) {
-    reload_graphical_assets();
+    canvas::rebuild_canvases_if_needed();
 
     load_best_time(filename, Single);
 

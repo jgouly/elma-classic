@@ -878,7 +878,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
 }
 
 void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop) {
-    reload_graphical_assets();
+    canvas::rebuild_canvases_if_needed();
 
     fps::update();
 
