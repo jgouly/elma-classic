@@ -1027,6 +1027,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
     }
 
     double current_replay_time = 0.0;
+    std::optional<double> end_pause_started_at;
     double last_stopwatch = stopwatch();
 
     fps::reset();
@@ -1060,7 +1061,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
         bool rewinding = is_game_key_down(State->key_replay_rewind);
         bool paused = is_game_key_down(State->key_replay_pause);
 
-        if (!paused) {
+        if (!paused && !end_pause_started_at) {
             if (rewinding) {
                 current_replay_time -= dt * speed;
                 current_replay_time = std::max(current_replay_time, 0.0);
@@ -1093,8 +1094,19 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             update_graphical_metadata(driv2, false, time);
         }
 
+        const bool replay_finished = Single ? finished1 : finished1 && finished2;
+        bool end_pause_complete = true;
+        if (replay_finished && EolSettings->pause_replay_for_1s()) {
+            if (!end_pause_started_at) {
+                end_pause_started_at = now;
+            }
+            constexpr double END_PAUSE_MILLISECONDS = 1000.0;
+            end_pause_complete =
+                (now - *end_pause_started_at) / STOPWATCH_MULTIPLIER >= END_PAUSE_MILLISECONDS;
+        }
+
         // End of replay
-        if ((Single && finished1) || (!Single && finished1 && finished2)) {
+        if (replay_finished && end_pause_complete) {
             set_motor_frequency(true, 1.0, 0);
             set_motor_frequency(false, 1.0, 0);
             stop_motor_sound(true);
@@ -1195,6 +1207,9 @@ void render_replay(const char* level_filename) {
     driver driv1(Motor1, Rec1, &State->keys1, &HudReplay1);
     driver driv2(Motor2, Rec2, &State->keys2, &HudReplay2);
 
+    int end_pause_frames_remaining =
+        EolSettings->pause_replay_for_1s() ? EolSettings->recording_fps() : 0;
+    double final_frame_time = 0.0;
     fps::reset();
     while (true) {
         handle_events();
@@ -1211,13 +1226,20 @@ void render_replay(const char* level_filename) {
             finished2 = !replay_frame(driv2, time, &driv1.draw_view);
         }
 
+        const bool replay_finished = Single ? finished1 : finished1 && finished2;
+        if (replay_finished) {
+            if (end_pause_frames_remaining == 0) {
+                break;
+            }
+            end_pause_frames_remaining--;
+            time = final_frame_time;
+        } else {
+            final_frame_time = time;
+        }
+
         update_graphical_metadata(driv1, false, time);
         if (!Single) {
             update_graphical_metadata(driv2, false, time);
-        }
-
-        if ((Single && finished1) || (!Single && finished1 && finished2)) {
-            break;
         }
 
         if (!Single) {
