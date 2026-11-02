@@ -15,8 +15,8 @@ if get_option('curl_verbose') == true
 endif
 
 elma_sources = files(
-    'src/api/api.cpp',
-    'src/api/curl_wrapper.cpp',
+    'src/platform/native/api/api.cpp',
+    'src/platform/native/api/curl_wrapper.cpp',
     'src/debug/profiler.cpp',
     'src/editor/canvas.cpp',
     'src/editor/dialog.cpp',
