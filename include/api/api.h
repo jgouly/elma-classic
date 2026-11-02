@@ -6,12 +6,23 @@
 
 namespace eol_api {
 
+#ifdef HAS_API
+
 void init();
 void cleanup();
 
 // Download an LGR to your lgr/ folder.
 // Returns an error string if not successful.
 std::optional<std::string> lgr_get(const std::string& lgr_name);
+
+#else
+
+void init() {}
+void cleanup() {}
+
+std::optional<std::string> lgr_get(const std::string& lgr_name) { return std::nullopt; }
+
+#endif
 
 } // namespace eol_api
 

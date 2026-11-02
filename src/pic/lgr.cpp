@@ -94,6 +94,7 @@ static bool lgr_exists(const char* lgr_name, const char* backup_lgr) {
         return false;
     }
 
+#ifdef HAS_API
     // Display warning
     finame filename;
     strcpy(filename, lgr_name);
@@ -117,6 +118,9 @@ static bool lgr_exists(const char* lgr_name, const char* backup_lgr) {
     }
     dialog_restore_palette();
     return exists;
+#else
+    return false;
+#endif
 }
 
 bool lgrfile::try_load_lgr(const char* name, const char* desc) {
