@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "main"
+      - "emss5"
     paths-ignore:
       - "**.md"
       - "**/docs/**"
@@ -125,11 +126,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-26.04
-          - os: windows-2025
-          - os: macos-26
-          - os: macos-15-intel
-            arch: x86_64
+          # - os: ubuntu-26.04
+          # - os: windows-2025
+          # - os: macos-26
+          # - os: macos-15-intel
+          #   arch: x86_64
           - os: ubuntu-26.04
             emscripten: true
           - os: windows-2025
