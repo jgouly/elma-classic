@@ -23,7 +23,7 @@ int strnicmp(const char* a, const char* b, size_t len);
 
 // #ifndef __EMSCRIPTEN__
 
-void strlwr(char* str);
+char* strlwr(char* str);
 
 // #endif
 
