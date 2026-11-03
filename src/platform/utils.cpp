@@ -34,7 +34,7 @@ int strnicmp(const char* a, const char* b, size_t len) {
     return v;
 }
 
-#ifndef __EMSCRIPTEN__
+// #ifndef __EMSCRIPTEN__
 
 void strlwr(char* str) {
     while (*str) {
@@ -43,6 +43,6 @@ void strlwr(char* str) {
     }
 }
 
-#endif
+// #endif
 
 #endif
